@@ -1,0 +1,247 @@
+
+#include "simpletools.h"
+#include "fdserial.h"
+#include "Arlo_DBH-10.h"
+
+
+
+
+fdserial *ard_dhb10_arlo;
+
+int ard_servo_pin_L    = ARD_DEFAULT_SERVO_L;
+int ard_servo_pin_R    = ARD_DEFAULT_SERVO_R;
+int ard_opened         = ARD_DEFAULT_OPENED;
+
+char dhb10_reply[DHB10_LEN];
+
+
+/*
+ * The DHB-10 will all way return CR (0x0D) after any command
+ * If an Error occurs the return will be in one of 2 formats
+ *    Verbose Mode:
+ *         "ERROR - error message\r"
+ *    Non Verbose mode:
+ *         "# E\r"
+ *
+ * If no Errors the responce will be one of 3 type
+ *    No Data:
+ *         "\r"
+ *    One Integer
+ *         "#\r"
+ *    Two Integers
+ *         "# #\r"
+ *
+ *
+ *
+ */
+
+
+
+
+/*
+ *   functions to open, close and comunicate with the dhb10_reply
+ *
+ */
+
+char *drive_open(void)
+{  
+  memset(dhb10_reply, 0, DHB10_LEN);
+  char *reply = dhb10_reply;
+
+  #ifdef HALF_DUPLEX
+    ard_dhb10_arlo = fdserial_open(ard_servo_pin_L, ard_servo_pin_L, 0b1100, 19200);
+    ard_opened = 1;
+    pause(10);
+  #else
+    ard_dhb10_arlo = fdserial_open(ard_servo_pin_R, ard_servo_pin_L, 0b0000, 19200);
+    ard_opened = 1;
+    pause(10);
+    fdserial_txChar(ard_dhb10_arlo, 'T');
+    fdserial_txChar(ard_dhb10_arlo, 'X');
+    fdserial_txChar(ard_dhb10_arlo, 'P');
+    fdserial_txChar(ard_dhb10_arlo, 'I');
+    fdserial_txChar(ard_dhb10_arlo, 'N');
+    fdserial_txChar(ard_dhb10_arlo, ' ');
+    fdserial_txChar(ard_dhb10_arlo, 'C');
+    fdserial_txChar(ard_dhb10_arlo, 'H');
+    fdserial_txChar(ard_dhb10_arlo, '2');
+    fdserial_txChar(ard_dhb10_arlo, '\r');    
+  #endif   
+  //reply = dhb10_com("\r");
+  //reply = dhb10_com("verb 1\r");
+  dhb10_send("\r");
+  dhb10_send("verb 1\r");
+  
+  return reply;
+}
+
+
+void drive_close(void)
+{
+  drive_set_stop();
+  drive_rst();
+  fdserial_close(ard_dhb10_arlo);
+  ard_opened = 0;
+}
+
+/*
+ * dhb10_send(char *CmdStr)
+ *
+ * Returns lenght of responce on succsess else -1
+*/
+int dhb10_send(char *CmdStr)
+{
+  memset(dhb10_reply, 0, DHB10_LEN);
+  char *reply = dhb10_reply;
+  memset(reply,0,DHB10_LEN);//Empty the String
+       
+  if(!ard_opened) drive_open();
+
+  int ca = 0, cta = 0;
+  
+  fdserial_rxFlush(ard_dhb10_arlo);
+
+  int i = 0;
+  
+  while(1) 
+  {
+    fdserial_txChar(ard_dhb10_arlo, CmdStr[i]);
+    if((CmdStr[i] == '\r') || (CmdStr[i] == 0)) break;
+    i++;
+  }
+  
+  // No cmd just a return
+  if((i == 0) && (CmdStr[i] == '\r'))
+  {
+    return 0;
+  }    
+
+  i = 0;
+  int t = CNT;
+  int dt = CLKFREQ;
+  while(1)
+  {
+    cta = fdserial_rxCount(ard_dhb10_arlo);
+    if(cta)
+    {
+      ca = readChar(ard_dhb10_arlo);
+      dhb10_reply[i] = ca;
+      if(dhb10_reply[i] == '\r')
+      {
+        reply = dhb10_reply;
+        break;
+      }  
+      i++;
+    }
+
+    if(CNT - t > dt)
+    {
+      strcpy(reply, "Error, no reply from DHB-10!\r");
+      break;
+    }  
+  }
+  //remove the \r
+  if(strlen(reply) > 0)
+     reply[strlen(reply)-1] = 0;
+  //Check for errors
+  if( reply[0] == 'E' || reply[strlen(reply)] == 'E')
+    return(-1);
+  return(strlen(reply));    
+}
+
+
+/*
+ * drive_set_stop()
+ *
+ * Returns 0 on succsess else 1
+*/
+int drive_set_stop()
+{
+  if (dhb10_send("GOSPD 0 0\r") == -1)
+    return(1); //indicate an error occured
+  return(0);  
+}
+
+/*
+ * drive_set_gospd(int left,int right)
+ *
+ * Returns 0 on succsess else 1
+*/
+int drive_set_gospd(int left,int right)
+{
+  char s[20]; // Hold strings converted for sending to DHB-10
+  sprint(s, "GOSPD %d %d\r", left, right);
+  if(dhb10_send(s) == -1)
+  {
+    return(1); //indicate an error occured
+  }  
+  return(0);  
+}
+
+/*
+ * drive_get_dist(int *left,int *right)
+ * Returns 0 on succsess else 1
+*/
+int drive_get_dist(int *left,int *right)
+{
+  char *reply = dhb10_reply;
+  int results = dhb10_send("DIST\r");
+  if (results == -1 || results < 3)
+  { //handle error or missing data
+    *left = 0;
+    *right = 0;
+    return(1);
+  }
+  sscan(reply, "%d%d", left, right);
+  return(0);
+}
+
+/*
+ * drive_get_head(int *heading)
+ *
+ * Returns 0 on succsess else 1
+*/
+int drive_get_head(int *heading)
+{
+  char *reply = dhb10_reply;
+  int results = dhb10_send("HEAD\r");
+  if ( results == -1) 
+  {
+    *heading = 0;
+    return(1);
+  } 
+  *heading = atoi(reply);
+  return(0);
+}
+
+
+/*
+ * drive_get_spd(int *left,int *right)
+ *
+ * Returns 0 on succsess else 1
+*/
+int drive_get_spd(int *left,int *right)
+{
+  char *reply = dhb10_reply;
+  int results = dhb10_send("SPD\r");
+  if (results == -1) {
+    *left = 0;
+    *right = 0;
+    return(1);
+  }
+  sscan(reply, "%d%d", left, right);
+  return(0);
+}
+
+
+/*
+ * drive_rst()
+ *
+ * Returns 0 on succsess else 1
+*/
+int drive_rst()
+{
+  if(dhb10_send("RST\r") == -1 )
+    return(1); //indicate an error occured
+  return(0);  
+}
