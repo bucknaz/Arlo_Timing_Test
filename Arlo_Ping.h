@@ -17,7 +17,9 @@ extern "C" {
 // Global Storage for PING & IR Sensor Data:
 extern int pingArray[NUMBER_OF_PING_SENSORS];
 extern int irArray[NUMBER_OF_IR_SENSORS];
-
+//#ifdef hasFloorObstacleSensors
+//extern int floorArray[NUMBER_OF_FLOOR_SENSORS] = {0};
+//#endif
 
 /* Public Functions in this file */
 int ping_start();

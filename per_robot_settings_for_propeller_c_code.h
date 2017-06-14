@@ -1,25 +1,15 @@
-/* ATTENTION! ATTENTION! ATTENTION! ATTENTION! ATTENTION! ATTENTION!
-You MUST edit the following settings based on the physical layout
-of your robot!
-For each QUESTION:
-UNCOMMENT '#define' lines for any included items,
-COMMENT '#define' lines for anything that is not included.
-For each SETTING:
-Set the variable as required, noting that usually these are ignored if the preceding QUESTION is commented out.
 
-Example, My robot has a "Thing1", but not a "Thing2"
-*/
-//#define hasThingOne
-//#define hasTHingTwo
 
-/* Just like that, comment out the "has" line for things you do not have,
-and if you do have the thing, adjust the numbers on the other definition as needed.
-By using the #define lines, code for items you do not have is never seen by the compiler and is never even loaded on the Propeller bard, saving memory. */
+//Set this to test without ROS connected
+#define EMULATE_ROS
 
-/* NOTICE NOTICE NOTICE
-Changes to this file will NOT have any affect until you RELOAD the C code onto the
-propeller board with SimpleIDE!!!
-*/
+//If the DHB-10 is not present set this to test code
+#define EMULATE_ARLO
+
+//Set this to emit odometry
+#define enableOutput // Do NOT comment this out when running ROS!
+
+
 
 // PROXIMITY SENSOR TUNING
 // Use these to tune the robots responses!
@@ -309,4 +299,3 @@ Sometimes this is helpful to clean up the output for debugging.
 This MUST be enabled for ROS to work though!
 */
 
-#define enableOutput // Do NOT comment this out when running ROS!

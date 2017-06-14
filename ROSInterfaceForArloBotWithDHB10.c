@@ -170,58 +170,6 @@ Nack                    byte "ERROR ", 0
 Overflow                byte "1", 0, "- Overflow", 0
 */
 
-
-/**************************************************************/
-/*
-static volatile int t, dt, cog;               // Global var for cogs to share
-static unsigned int stack[40 + 25];           // Stack vars for other cog
-
-void ms_timer(void *par);                 
-
-int mstime_start()
-{
-  mstime_stop();
-  cog = 1 + cogstart(ms_timer, NULL, stack, sizeof(stack));
-}
-
-void mstime_stop()
-{
-  if(cog)
-  {
-    cogstop(cog -1);
-    cog = 0;
-  }    
-}
-
-int mstime_get()
-{
-  return t;
-}
-
-void mstime_reset()
-{
-  t = 0;
-}
-
-void mstime_set(int newTime)
-{
-  t = newTime;
-}
-
-// Function runs in another cog
-void ms_timer(void *par)                      
-{
-  dt = CLKFREQ/1000; //get the clk cycles per sec / 1000
-  int ticks = CNT;//get the current counter value
-  while(1)                                   
-  {
-    waitcnt(ticks+=dt);                              
-    t++; //increments every ms 
-  
-  }                            
-}
-*/
-
 //5 mhz xtal
 //64 KB EEPROM for program and data storage
 // pause is in ms 
@@ -270,53 +218,13 @@ get the dist 10ms later
 get the speed 10ms later
 get the head 10ms later and emit the odometry
 
-send the internals every 200 ms
-
-    switch (t)
-    {
-     case 125:// 1/8
-     case 250:// 1/4 2/8
-     case 375:// 3/8
-     case 500:// 1/2 2/4 4/8 
-     case 625:// 5/8
-     case 750:// 3/4 6/8
-     case 875:// 7/8
-     case 1000:// 1 2/2 4/4 8/8
-     
-        mstime_reset();
-        break    
-    }        
 */
 
 /*************************************************************/
 
 
 /**************************************************************/
-/*
 
-mstime_start(); //Start the mstimer in another cog
-int time = mstime_get(); //get the elapsed time
-
-int main()                                   
-{
-  mstime_start();
-  int dt = CLKFREQ;
-  int t = CNT;
-  while(1)
-  {
-    int time = mstime_get();
-    print("time = %d\n", time);                    
-    waitcnt(t += dt);
-  }    
-}
-
-pace timer
-  indicate when ok to send new command
-  indicate time to retreive odometry
-  indicate time to send slow state
-
-
-*/
 int Looptime;
 int starttime;
 int tm;
@@ -330,16 +238,17 @@ volatile char sensorbuf[133];
 
 
 int main() {
-    char *curbuf;
+    
 
     simpleterm_close(); // Close simplex serial terminal
     term = fdserial_open(31, 30, 0, 115200); // Open Full Duplex serial connection
-mstime_start();
+
 
     // Robot description: We will get this from ROS so that it is easier to tweak between runs without reloading the Propeller EEPROM.
     // http://learn.parallax.com/activitybot/calculating-angles-rotation
     // See ~/catkin_ws/src/ArloBot/src/arlobot/arlobot_bringup/param/arlobot.yaml to set or change this value
-    double distancePerCount = 0.0, trackWidth = 0.0;
+    double distancePerCount = 0.0;
+    double trackWidth = 0.0;
 
     // For Odometry
     int ticksLeft, ticksRight, ticksLeftOld, ticksRightOld;
@@ -752,14 +661,6 @@ tm = mstime_get();
         pause(mainLoopPause); // Maximum read frequency.
     }
 }
-
-/*
-mstime_start();
-mstime_reset(); 
-tm = mstime_get();
-dprint(term,"%d ",tm);
-
-*/
 
 
 

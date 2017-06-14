@@ -2,7 +2,7 @@
 
 
 #include "simpletools.h"                      // Include simpletools
-#include "mstimer.h"
+#include "sequencer.h"
 
 static volatile int t, dt, cog;               // Global var for cogs to share
 static unsigned int stack[40 + 25];           // Stack vars for other cog

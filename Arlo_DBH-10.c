@@ -48,6 +48,11 @@ char *drive_open(void)
   memset(dhb10_reply, 0, DHB10_LEN);
   char *reply = dhb10_reply;
 
+  #ifdef EMULATE_ARLO
+  pause(2); //should time this
+  strcpy(reply,"Ok");
+  #else
+
   #ifdef HALF_DUPLEX
     ard_dhb10_arlo = fdserial_open(ard_servo_pin_L, ard_servo_pin_L, 0b1100, 19200);
     ard_opened = 1;
@@ -71,7 +76,7 @@ char *drive_open(void)
   //reply = dhb10_com("verb 1\r");
   dhb10_send("\r");
   dhb10_send("verb 1\r");
-  
+  #endif
   return reply;
 }
 
@@ -80,7 +85,11 @@ void drive_close(void)
 {
   drive_set_stop();
   drive_rst();
+  #ifdef EMULATE_ARLO
+  pause(2); //should time this
+  #else
   fdserial_close(ard_dhb10_arlo);
+  #endif
   ard_opened = 0;
 }
 
@@ -91,6 +100,10 @@ void drive_close(void)
 */
 int dhb10_send(char *CmdStr)
 {
+  #ifdef EMULATE_ARLO
+  pause(3);//this is not the right time but never should get called directly
+  return(1);
+  #else
   memset(dhb10_reply, 0, DHB10_LEN);
   char *reply = dhb10_reply;
   memset(reply,0,DHB10_LEN);//Empty the String
@@ -147,6 +160,7 @@ int dhb10_send(char *CmdStr)
   if( reply[0] == 'E' || reply[strlen(reply)] == 'E')
     return(-1);
   return(strlen(reply));    
+  #endif
 }
 
 
@@ -157,8 +171,12 @@ int dhb10_send(char *CmdStr)
 */
 int drive_set_stop()
 {
+  #ifdef EMULATE_ARLO
+  pause(7);
+  #else
   if (dhb10_send("GOSPD 0 0\r") == -1)
     return(1); //indicate an error occured
+  #endif
   return(0);  
 }
 
@@ -169,12 +187,16 @@ int drive_set_stop()
 */
 int drive_set_gospd(int left,int right)
 {
+  #ifdef EMULATE_ARLO
+  pause(7);
+  #else
   char s[20]; // Hold strings converted for sending to DHB-10
   sprint(s, "GOSPD %d %d\r", left, right);
   if(dhb10_send(s) == -1)
   {
     return(1); //indicate an error occured
   }  
+  #endif
   return(0);  
 }
 
@@ -184,6 +206,11 @@ int drive_set_gospd(int left,int right)
 */
 int drive_get_dist(int *left,int *right)
 {
+  #ifdef EMULATE_ARLO
+  pause(8);
+  *left = 45;
+  *right = 44;
+  #else
   char *reply = dhb10_reply;
   int results = dhb10_send("DIST\r");
   if (results == -1 || results < 3)
@@ -193,6 +220,7 @@ int drive_get_dist(int *left,int *right)
     return(1);
   }
   sscan(reply, "%d%d", left, right);
+  #endif
   return(0);
 }
 
@@ -203,6 +231,10 @@ int drive_get_dist(int *left,int *right)
 */
 int drive_get_head(int *heading)
 {
+  #ifdef EMULATE_ARLO
+  pause(7);
+  *heading = 45;
+  #else
   char *reply = dhb10_reply;
   int results = dhb10_send("HEAD\r");
   if ( results == -1) 
@@ -211,6 +243,7 @@ int drive_get_head(int *heading)
     return(1);
   } 
   *heading = atoi(reply);
+  #endif
   return(0);
 }
 
@@ -222,6 +255,11 @@ int drive_get_head(int *heading)
 */
 int drive_get_spd(int *left,int *right)
 {
+  #ifdef EMULATE_ARLO
+  pause(8);
+  *left = 120;
+  *right = 119;
+  #else
   char *reply = dhb10_reply;
   int results = dhb10_send("SPD\r");
   if (results == -1) {
@@ -230,6 +268,7 @@ int drive_get_spd(int *left,int *right)
     return(1);
   }
   sscan(reply, "%d%d", left, right);
+  #endif
   return(0);
 }
 
@@ -241,7 +280,11 @@ int drive_get_spd(int *left,int *right)
 */
 int drive_rst()
 {
+  #ifdef EMULATE_ARLO
+  pause(4);
+  #else
   if(dhb10_send("RST\r") == -1 )
     return(1); //indicate an error occured
+  #endif
   return(0);  
 }

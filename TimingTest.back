@@ -4,6 +4,12 @@
 */
 #include "simpletools.h"                      // Include simple tools
 #include "fdserial.h"
+#define EMULATE_ROS
+#define EMULATE_ARLO
+//should we emit odometery lines to ROS terminal
+#define enableOutput
+
+
 
 #include "per_robot_settings_for_propeller_c_code.h"
 #include "Arlo_Ping.h"
@@ -11,17 +17,153 @@
 #include "Arlo_DBH-10.h"
 #include "Arlo_Ir.h"
 #include "Arlo_Gyro.h"
-#include "sequencer.h"
 
-// This is the ROS io port
+
+
+
+
+
+
+
+//#include "mstimer.h"
+
+// Ring buffer header file contents
+// 12 bytes long
+typedef struct ringbuffer_t {
+  void *buffer;       // buffer should be sizeof(uint32)*buffer_capacity bytes
+  uint8_t size_t;         // Size of the Item being stored in the queue
+  uint8_t buffer_capacity;    
+  uint8_t in,out;
+  uint8_t queue_count;   // number of entries currently enqueued
+  int lockId;
+} RingBuffer;
+
+
+/* Initialize a new RingBuffer. 
+ *
+ *  Returns
+ *   0 - Success
+ */
+int RingBuffer_init(RingBuffer *rbuf, void *buffer, uint8_t buffer_capacity,uint8_t size_t);
+void RingBuffer_destroy(RingBuffer *rbuf);
+
+/* Synchronized put, will overwrite oldest entry if full */
+void RingBuffer_enqueue(RingBuffer *rbuf, void *entry);
+
+/* Synchronized get, dest must point to entry_size bytes 
+ *
+ * Returns
+     0 - Success, new entry present at dest
+     1 - Failure, queue is empty. dest undefined
+ */
+int RingBuffer_dequeue(RingBuffer *rbuf, void *dest);
+
+//End ring buffer header file contents
+
+
+
+#define MIN_MSG_DELTA 500
+#define MIN_Q_DELTA 1500
+#define LOOP_DELTA 100
+#define MIN_MSG_DELTA 20
+
+int nextPtime;
+int testtime;
+int Looptime;
+int starttime;
+int nextcmdtime;
+
 fdserial *term;
 
+//static volatile int  dt;   
+//static volatile int  nextcnt;   
+
+//    clkfreq: 80000000
+//    clkmode: XTAL1+PLL16X
+  //clkset(_CLKMODE,50000000);
+/*
+int xmain()                                    // Main function
+{
+  int ms = 0, tm = 0;
+  int  nextcnt;   
+  simpleterm_close();
+  term = fdserial_open(31, 30, 0, 115200);
+  pause(1000);
+  dprint(term, "Starting\n");
+  // Add startup code here.
+  sequencer_start();
+
+  //dt = CLKFREQ/1000; //every 1 ms
+  dt = CLKFREQ/100; //every 10 ms
+  //dt = CLKFREQ/10; //every 100 ms
+  nextcnt = CNT + dt;
+  
+  nextcmdtime = (( CLKFREQ ) * MIN_MSG_DELTA) + CNT;//get the current counter value   
+ 
+  while(1)
+  {     
+                   
+    nextcnt = CNT + (dt-Looptime);// dt - clock cycles used
+    waitcnt(nextcnt); //wait 1ms   
+    ms++;                    
+
+    starttime = CNT;       
+
+    // Add main loop code here.
+    if(ms % 100 == 0 )
+    {
+         dprint(term," IS printed %u %u %u\n",tm,dt, dt-Looptime);
+         
+         //ms=0;
+    }
+    else if(ms % 50 == 0 )
+    {
+         dprint(term,"*");
+    }             
+    else if(ms % 10 == 0 )// every 100ms
+    {
+         dprint(term,"." );
+    }     
+
+    tm = sequencer_get();
+    sequencer_reset();         
+
+       
+ /*   
+    if(nextcmdtime < CNT ){
+      waitcnt(nextcmdtime);
+    }
+    if(nextcmdtime > CNT ){
+      dprint(term,"!");
+      nextcmdtime = (( CLKFREQ ) * MIN_MSG_DELTA) + CNT;//get the current counter value   
+   }     
+*/    
+/*    
+    //pause(20);
+    Looptime = CNT - starttime ; // How many clock cycle we used   
+
+  }  
+}
+*/
+
+#define NUMBER_OF_PING_SENSORS 6
+#define NUMBER_OF_IR_SENSORS 1
+//#define NUMBER_OF_FLOOR_SENSORS 4
 
 static double gyroHeading = 0.0;
 double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;
 
+//These are in safety override
+volatile int ignoreProximity = 0;
+volatile int ignoreCliffSensors = 0;
+volatile int ignoreIRSensors = 0;
+volatile int ignoreFloorSensors = 0;
+volatile int pluggedIn = 0;
+
 
 const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
+// Maximum speed in ticks per second. Even if ROS asks us to go faster, we will not.
+#define MAXIMUM_SPEED 200 // 200 is default in arlodrive too, but we may change it.
 
 
 double distancePerCount = 0.0, trackWidth = 0.0;
@@ -37,16 +179,24 @@ int abdR_speedLimit = MAXIMUM_SPEED; // Reverse speed limit to allow robot to re
 
 
 
+int pingArray[NUMBER_OF_PING_SENSORS] = {0};
+int irArray[NUMBER_OF_IR_SENSORS] = {0};
+#ifdef hasFloorObstacleSensors
+int floorArray[NUMBER_OF_FLOOR_SENSORS] = {0};
+#endif
 
-
-static char sensorbuf[132];
+static volatile char sensorbuf[132];
 #define RXBUFFERLEN 40
 static char rx_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
 static char in_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
 static int rx_count = 0;
 static int got_one = 0;
-
+int floorO=0;
+int cliff=0;
 float BatteryVolts=12.0, RawBatVolts=4.0;
+int minDistanceSensor = 2;
+int Escaping = 0;
+int safeToProceed=1, safeToRecede=1;
 
 
 //Stack for ros emulater
@@ -83,12 +233,6 @@ int check_input(fdserial *term)
   return(got_one);
 }
 
-/*
- *  pars_input()
- *
- *  Parse the data recived in the in_buf and populate 
- *  values as required
- */
 void pars_input()
 {
   if (in_buf[0] == 's') 
@@ -171,12 +315,7 @@ void pars_input()
 }  
 
 
-/*
- *  clearTwistRequest()
- *  
- *  Reset the twist velocitys to 0
- *  
- */
+
 void clearTwistRequest() {
   CommandedVelocity = 0.0;
   CommandedAngularVelocity = 0.0;
@@ -184,10 +323,29 @@ void clearTwistRequest() {
 }
 
 
-/*
- *  The Main Event
- *  
- */
+/* create a state machine to select which
+   task get executed each time though the loop
+   
+  every time though the loop
+  check for twist cmd
+  safty override
+  send twistcmd 5ms guessing
+  
+  switch (state)
+  {
+    read dist  8ms
+    read spd   8ms
+    read head  7ms
+    format odometery  13ms
+    format ping       8ms
+    format ir         2ms
+    format floor      2ms
+    xmit odometry     10ms
+    xmit status       call it 10
+  }
+  state++; 
+*/
+
 int main()
 {
   int tm = 0;
@@ -417,27 +575,39 @@ int main()
         }          
         break;
         
-      case 1:// read speed   8ms        
+      case 1:// read speed   8ms
+        #ifdef EMULATE_ARLO
+        pause(8);
+        #else
         if ( drive_get_spd(&speedLeft, &speedRight) )
         {
           ;// handle error
         }    
+        #endif      
         break;
 
       case 2:// read distance  8ms
         ticksLeftOld = ticksLeft;
         ticksRightOld = ticksRight;
+        #ifdef EMULATE_ARLO
+        pause(8);
+        #else
         if ( drive_get_dist(&ticksLeft,&ticksRight) )
         {
           ;// handle error
         }          
+        #endif      
         break;
 
       case 3:// read heading  7ms
+        #ifdef EMULATE_ARLO
+        pause(7);
+        #else
         if ( drive_get_head(&heading) )
         {
           ;// handle error
-        }            
+        }          
+        #endif  
         // The heading is apparently reversed in relation to what ROS expects, hence the "-heading"
         Heading = -heading * PI / 180.0; // Convert to Radians
 
@@ -582,7 +752,147 @@ void ROS()
 #endif
 
 
+////////////////////////////////////////////////////////////////////////////////
+//#include "ringbuffer.h"
+
+int RingBuffer_init(RingBuffer *rbuf, void *buffer, uint8_t buffer_capacity, uint8_t size_t)
+{
+  rbuf->buffer = buffer;
+  rbuf->size_t = size_t;
+  rbuf->buffer_capacity = buffer_capacity;
+  rbuf->in = rbuf->out = 0;
+  rbuf->lockId = locknew();
+  return 0;
+}
+
+
+void RingBuffer_destroy(RingBuffer *rbuf) {
+  lockret(rbuf->lockId);
+}
+
+void RingBuffer_enqueue(RingBuffer *rbuf, void *entry)
+{
+  while (lockset(rbuf->lockId) != 0) { /*spin lock*/ }
+  //rbuf->buffer[rbuf->in++ % rbuf->buffer_capacity] = *(uint32_t*)entry;
+
+  memcpy(rbuf->buffer +(rbuf->in++ % rbuf->buffer_capacity)*rbuf->size_t,entry,rbuf->size_t);
+
+  rbuf->queue_count++;
+  lockclr(rbuf->lockId);
+}
+
+
+int RingBuffer_dequeue(RingBuffer *rbuf, void *dest)
+{
+  if (rbuf->queue_count < 1) {
+    return 1;
+  }
+
+  while (lockset(rbuf->lockId) != 0) { /*spin lock*/ }
+  // *(uint32_t*)dest = rbuf->buffer[rbuf->out++ % rbuf->buffer_capacity];
+  memcpy(dest,rbuf->buffer +(rbuf->out++ % rbuf->buffer_capacity)*rbuf->size_t,rbuf->size_t);
+  rbuf->queue_count--;
+  lockclr(rbuf->lockId);
+  return 0;
+}
+
+//Ring buffer test
+//4 bytes long
+typedef struct {
+  uint8_t foo ;
+  uint32_t bar ;
+} TestStruct;
+  
+//TestStruct doda;
+//uint8_t eight;      //1
+//uint16_t sixteen;   //2
+//uint32_t thirtytwo; //4
+//uint32_t *pointer;  //4
+
+#define TEST_BUF_SIZE 8
+TestStruct structbuffer[TEST_BUF_SIZE];//A array 0x20 32 bytes long
+RingBuffer ringbuff; //12 
+
+uint32_t stack[40+25];
+
+void producer();
+
+
+int ringbuf_main() {
+  TestStruct s;
+  RingBuffer_init(&ringbuff, structbuffer, TEST_BUF_SIZE,sizeof(s));
+  // start cog1 as the producer
+  cogstart(&producer, NULL, stack, sizeof(stack));
+
+  while (1) {
+    //while (RingBuffer_dequeue(&ringbuff, &s) != 0) { /* spinlock */ }
+   
+    while (!RingBuffer_dequeue(&ringbuff, &s) )
+    {
+        printf("foo=%d bar=%d cnt=%d\n", s.foo, s.bar,ringbuff.queue_count);
+    }    
+    pause(500);
+  }    
+}  
+
+
+void producer() {
+  TestStruct newStruct;
+  uint16_t fooCounter = 0;
+  uint8_t barCounter = 0;
+
+  volatile unsigned int wait_time = CLKFREQ;
+  unsigned int nextcnt = wait_time + CNT;
+  
+  while (1) {    
+    newStruct.foo = fooCounter++;
+    newStruct.bar = barCounter--;
+    RingBuffer_enqueue(&ringbuff, &newStruct);
+    nextcnt = waitcnt2(nextcnt, wait_time);
+  }      
+}
 
 
 
 
+
+
+/* Though to use another cog
+
+static unsigned int ostack[128];           // Stack vars for other cog
+static volatile int ocog;  
+int odometry_start()
+{
+  odometry_stop();
+  ocog = 1 + odometry(odometry, NULL, ostack, sizeof(ostack));
+}
+
+void odometry_stop()
+{
+  if(ocog)
+  {
+    cogstop(ocog -1);
+    ocog = 0;
+  }    
+}
+
+// Function runs in another cog
+void odometry(void *par)                      
+{
+  term = fdserial_open(31, 30, 0, 115200);
+  pause(1000);
+  
+  while(1)                                   
+  {
+
+  //send odometery
+  //check for twist
+  ;
+  
+  
+
+  }
+                              
+}
+
+*/

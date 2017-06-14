@@ -1,5 +1,10 @@
 TimingTest.c
 sequencer.c
+Arlo_DBH-10.c
+Arlo_SafetyOverride.c
+Arlo_Ping.c
+Arlo_Ir.c
+Arlo_mcp3008.c
 >compiler=C
 >memtype=cmm main ram compact
 >optimize=-Os

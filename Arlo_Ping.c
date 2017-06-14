@@ -17,7 +17,9 @@ static int pstack[128]; // If things get weird make this number bigger!
 // Global Storage for PING & IR Sensor Data:
 int pingArray[NUMBER_OF_PING_SENSORS] = {0};
 int irArray[NUMBER_OF_IR_SENSORS] = {0};
-
+#ifdef hasFloorObstacleSensors
+int floorArray[NUMBER_OF_FLOOR_SENSORS] = {0};
+#endif
 
 
 int ping_start()
