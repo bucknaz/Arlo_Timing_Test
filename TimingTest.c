@@ -303,8 +303,7 @@ int main()
       pars_input(); //5ms
       got_one = 0;
       timeoutCounter = 0;
-    }
-// Timout code needs to be though out better    
+    }// Timout code needs to be though out better    
     else if (timeoutCounter > ROStimeout) 
     {
         #ifdef debugModeOn
@@ -314,7 +313,9 @@ int main()
         expectedRightSpeed = 0;
         clearTwistRequest();
         timeoutCounter = ROStimeout; // Prevent runaway integer length          
-    }       
+    }     
+    
+      
     /* This updates the motor controller on EVERY
        round. This way even if there is no updated twist command
        from ROS, we will still account for updates in the speed limit
@@ -325,14 +326,10 @@ int main()
        from ROS for too long.
     */
 
-    #ifdef EMULATOR
-      pause(1);
-    #else
     if ( safty_check(CommandedVelocity,&expectedLeftSpeed,&expectedRightSpeed) )
     {
       clearTwistRequest();//ignore twist msg if we are escaping or blocked
     }    
-    #endif
               
     /* to simplify communications with teh dhb-10 we send the command to go in only one place */
     /* first check if there has been a change dont overload with needless commands */
@@ -341,14 +338,10 @@ int main()
       curLeftspeed = (int)expectedLeftSpeed;
       curRightSpeed = (int)expectedRightSpeed;
       //pause(dhb10OverloadPause);
-      #ifdef EMULATE_ARLO
-        pause(5);
-      #else
       if ( drive_set_gospd(curLeftspeed,curRightSpeed) )
       {
         ;// handle error
       }    
-      #endif        
     }        
 
 
@@ -373,6 +366,7 @@ int main()
           dprint(term, "i\t0\n");
           #endif 
           state = -1; //We increment after switch putting us back to 0
+          
           //Copied from origional code, should be reworked.
           #ifdef hasPIR
           int PIRstate = 0;
