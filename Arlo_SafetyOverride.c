@@ -11,20 +11,20 @@ extern int abd_speedLimit;
 extern int abdR_speedLimit;
 
 // For "Safety Override" Cog
-volatile int safeToProceed = 0,
-safeToRecede = 0,
-cliff = 0,
-floorO = 0,
-Escaping = 0,
-escapeLeftSpeed = 0,
-escapeRightSpeed = 0,
-minDistanceSensor = 0,
-ignoreProximity = 0,
-ignoreCliffSensors = 0,
-ignoreFloorSensors = 0,
-ignoreIRSensors = 0,
-pluggedIn = 0,
-wasEscaping = 0;
+volatile int safeToProceed = 0;
+volatile int safeToRecede = 0;
+volatile int cliff = 0;
+volatile int floorO = 0;
+volatile int Escaping = 0;
+volatile int escapeLeftSpeed = 0;
+volatile int escapeRightSpeed = 0;
+volatile int minDistanceSensor = 0;
+volatile int ignoreProximity = 0;
+volatile int ignoreCliffSensors = 0;
+volatile int ignoreFloorSensors = 0;
+volatile int ignoreIRSensors = 0;
+volatile int pluggedIn = 0;
+volatile int wasEscaping = 0;
 
 // This can use proximity sensors to detect obstacles (including people) and cliffs
 // This can use the gyro to detect tipping

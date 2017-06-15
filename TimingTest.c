@@ -13,40 +13,53 @@
 #include "Arlo_Gyro.h"
 #include "sequencer.h"
 
+
+//Global vars used within this file
+
 // This is the ROS io port
 fdserial *term;
 
-
-static double gyroHeading = 0.0;
-double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;
-
-
-const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
-
-
-double distancePerCount = 0.0, trackWidth = 0.0;
-double CommandedVelocity = 0.0;
-double CommandedAngularVelocity = 0.0;
-double angularVelocityOffset = 0.0, expectedLeftSpeed = 0.0, expectedRightSpeed = 0.0;
-int curLeftspeed = 0, curRightSpeed =0;
-int robotInitialized=0;
-
-// declared outside main
-int abd_speedLimit = MAXIMUM_SPEED;
-int abdR_speedLimit = MAXIMUM_SPEED; // Reverse speed limit to allow robot to reverse fast if it is blocked in front and visa versa
-
-
-
-
-
-static char sensorbuf[132];
+//used for input string processing
 #define RXBUFFERLEN 40
 static char rx_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
 static char in_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
 static int rx_count = 0;
 static int got_one = 0;
 
-float BatteryVolts=12.0, RawBatVolts=4.0;
+//used for output string processing
+static char sensorbuf[132];
+
+
+#ifdef hasGyro
+static double gyroHeading = 0.0;
+#endif
+
+
+const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
+
+double Heading = 1.0;
+double X = 0.0;
+double Y = 0.0;
+double deltaDistance;
+double V;
+double Omega;
+double distancePerCount = 0.0;
+double trackWidth = 0.0;
+double CommandedVelocity = 0.0;
+double CommandedAngularVelocity = 0.0;
+double angularVelocityOffset = 0.0;
+double expectedLeftSpeed = 0.0;
+double expectedRightSpeed = 0.0;
+int curLeftspeed = 0;
+int curRightSpeed =0;
+int robotInitialized=0;
+
+// declared outside main
+int abd_speedLimit = MAXIMUM_SPEED;
+int abdR_speedLimit = MAXIMUM_SPEED; // Reverse speed limit to allow robot to reverse fast if it is blocked in front and visa versa
+
+double BatteryVolts=12.0;
+double RawBatVolts=4.0;
 
 
 //Stack for ros emulater
@@ -62,10 +75,12 @@ void ROS();
  *  Checks if any characters have been recived and move then to the buffer
  *  when a complete line has been recived copy the buffer to in_buf and 
  *  sets a flag to indicate a complete command has been recived.
- *
+ *  Uses:
+ *    rx_count,rx_buf, 
  */
 int check_input(fdserial *term)
 {
+  int whole_line=0;
   if (fdserial_rxReady(term) != 0) { // Non blocking check for data in the input buffer        
     while (rx_count < RXBUFFERLEN && (fdserial_rxReady(term) != 0)) {
       rx_buf[rx_count] = fdserial_rxTime(term, 10); // fdserial_rxTime will time out. Otherwise a spurious character on the line will cause us to get stuck forever      
@@ -74,13 +89,13 @@ int check_input(fdserial *term)
         rx_buf[rx_count] = 0;
         memcpy(in_buf,rx_buf,rx_count+1);
         rx_count = 0;
-        got_one = 1;
+        whole_line = 1;
         break;
       }       
       rx_count++;
     }          
   }
-  return(got_one);
+  return(whole_line);
 }
 
 /*
@@ -88,6 +103,11 @@ int check_input(fdserial *term)
  *
  *  Parse the data recived in the in_buf and populate 
  *  values as required
+ *  Uses:
+ *     CommandedVelocity, CommandedAngularVelocity, trackWidth, abd_speedLimit,distancePerCount, abdR_speedLimit
+ *  Sets:
+ *    expectedLeftSpeed, expectedRightSpeed, robotInitialized
+ *    ignoreProximity, ignoreCliffSensors, ignoreIRSensors, ignoreFloorSensors, pluggedIn
  */
 void pars_input()
 {
@@ -163,7 +183,9 @@ void pars_input()
       Y = strtod(token, &unconverted);
       token = strtok(NULL, delimiter);
       Heading = strtod(token, &unconverted);
+      #ifdef hasGyro
       gyroHeading = Heading;
+      #endif
       if (trackWidth > 0.0 && distancePerCount > 0.0)
         robotInitialized = 1;
     }               
@@ -175,13 +197,15 @@ void pars_input()
  *  clearTwistRequest()
  *  
  *  Reset the twist velocitys to 0
- *  
+ *  Sets:
+ *     CommandedVelocity, CommandedAngularVelocity, angularVelocityOffset
  */
 void clearTwistRequest() {
   CommandedVelocity = 0.0;
   CommandedAngularVelocity = 0.0;
   angularVelocityOffset = 0.0;
 }
+
 
 
 /*
@@ -192,11 +216,8 @@ int main()
 {
   int tm = 0;
   int loop_time = 0;
-  //int i;
   int state=0;
-  //int throttleStatus=0;
-  
-  
+ 
   simpleterm_close();
   term = fdserial_open(31, 30, 0, 115200);
   pause(1000);//Give the terminal a sec to get started
@@ -229,18 +250,20 @@ int main()
   // Robot description: We will get this from ROS so that it is easier to tweak between runs without reloading the Propeller EEPROM.
   // http://learn.parallax.com/activitybot/calculating-angles-rotation
   // See ~/catkin_ws/src/ArloBot/src/arlobot/arlobot_bringup/param/arlobot.yaml to set or change this value
-  double distancePerCount = 0.0, trackWidth = 0.0;
+//  double distancePerCount = 0.0, trackWidth = 0.0;
 
   // For Odometry
   int ticksLeft, ticksRight, ticksLeftOld, ticksRightOld;
-  double Heading = 0.0, X = 0.0, Y = 0.0, deltaDistance, deltaX, deltaY, V, Omega;
-  int speedLeft, speedRight, throttleStatus = 0, heading, deltaTicksLeft, deltaTicksRight;
+//  double Heading = 0.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;
+  int speedLeft, speedRight, deltaX, deltaY, deltaTicksLeft, deltaTicksRight;
+  int throttleStatus = 0;
+  int heading;
   BatteryVolts = 12; //Just set it to something sane for right now
 
   /* Wait for ROS to give us the robot parameters,
      broadcasting 'i' until it does to tell ROS that we
      are ready */
-  int robotInitialized = 0; // Do not compute odometry until we have the trackWidth and distancePerCount
+//  int robotInitialized = 0; // Do not compute odometry until we have the trackWidth and distancePerCount
 
   // For PIRsensor
   #ifdef hasPIR
@@ -297,7 +320,7 @@ int main()
   
      timeoutCounter++;//keep track of timoutcount
      
-     check_input(term);
+     got_one |= check_input(term);//We or = to prevent clearing 
      if(got_one){
       //dprint(term,"%s%d",in_buf,tm);
       pars_input(); //5ms
@@ -469,7 +492,11 @@ int main()
            to deal with mirrors and targets below the Kinect/Xtion, but I'm not sure how practical that is.
         */
         memset(sensorbuf, 0, 132);
+        #ifdef hasGyro
         sprint(sensorbuf,"o\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f",X,Y,Heading,gyroHeading,V,Omega);
+        #else      
+        sprint(sensorbuf,"o\t%.3f\t%.3f\t%.3f\t0.0\t%.3f\t%.3f",X,Y,Heading,V,Omega);
+        #endif
         curbuf = sensorbuf + strlen(sensorbuf);
         break;
 
