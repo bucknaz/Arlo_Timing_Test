@@ -21,14 +21,14 @@
 // This is the ROS io port
 fdserial *term;
 
-<<<<<<< HEAD
-=======
-static double gyroHeading = 0.0;
-double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;
+//<<<<<<< HEAD
+//=======
+//static double gyroHeading = 0.0;
+//double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;
 
-const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
+//const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script//
 
->>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
+//>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
 //used for input string processing
 #define RXBUFFERLEN 40
 static char rx_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
@@ -46,10 +46,10 @@ static double gyroHeading = 0.0;
 
 const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
 
-<<<<<<< HEAD
-=======
-double distancePerCount = 0.0, trackWidth = 0.0;
->>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
+//<<<<<<< HEAD
+//=======
+//double distancePerCount = 0.0, trackWidth = 0.0;
+//>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
 double Heading = 1.0;
 double X = 0.0;
 double Y = 0.0;
@@ -71,18 +71,18 @@ int robotInitialized=0;
 int abd_speedLimit = MAXIMUM_SPEED;
 int abdR_speedLimit = MAXIMUM_SPEED; // Reverse speed limit to allow robot to reverse fast if it is blocked in front and visa versa
 
-<<<<<<< HEAD
-=======
+//<<<<<<< HEAD
+//=======
 
 static char sensorbuf[132];
 #define RXBUFFERLEN 40
 static char rx_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
 static char in_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
-static int rx_count = 0;
-static int got_one = 0;
+//static int rx_count = 0;
+//static int got_one = 0;
 
-float BatteryVolts=12.0, RawBatVolts=4.0;
->>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
+//float BatteryVolts=12.0, RawBatVolts=4.0;
+//>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
 double BatteryVolts=12.0;
 double RawBatVolts=4.0;
 
@@ -211,11 +211,11 @@ void pars_input()
       #ifdef hasGyro
       gyroHeading = Heading;
       #endif
-<<<<<<< HEAD
+//<<<<<<< HEAD
       if (trackWidth > 0.0 && distancePerCount > 0.0){
-=======
-      if (trackWidth > 0.0 && distancePerCount > 0.0)
->>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
+//=======
+//      if (trackWidth > 0.0 && distancePerCount > 0.0)
+//>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
         robotInitialized = 1;
         #ifdef debugModeOn
         dprint(term, "Initalized \n");
@@ -283,18 +283,18 @@ int main()
   // Robot description: We will get this from ROS so that it is easier to tweak between runs without reloading the Propeller EEPROM.
   // http://learn.parallax.com/activitybot/calculating-angles-rotation
   // See ~/catkin_ws/src/ArloBot/src/arlobot/arlobot_bringup/param/arlobot.yaml to set or change this value
-<<<<<<< HEAD
-=======
-  distancePerCount = 0.0; 
-  trackWidth = 0.0;
+//<<<<<<< HEAD
+//=======
+//  distancePerCount = 0.0; 
+//  trackWidth = 0.0;
 
-  // For Odometry
-  int ticksLeft, ticksRight, ticksLeftOld, ticksRightOld;
-  double Heading = 0.0, X = 0.0, Y = 0.0, deltaDistance, deltaX, deltaY, V, Omega;
-  int speedLeft, speedRight; 
-  int throttleStatus = 0;
-  int heading, deltaTicksLeft, deltaTicksRight;
->>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
+//  // For Odometry
+//  int ticksLeft, ticksRight, ticksLeftOld, ticksRightOld;
+//  double Heading = 0.0, X = 0.0, Y = 0.0, deltaDistance, deltaX, deltaY, V, Omega;
+//  int speedLeft, speedRight; 
+//  int throttleStatus = 0;
+//  int heading, deltaTicksLeft, deltaTicksRight;
+//>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
 //  double distancePerCount = 0.0, trackWidth = 0.0;
 
   // For Odometry
@@ -307,11 +307,7 @@ int main()
 
   /* Wait for ROS to give us the robot parameters,
      broadcasting 'i' until it does to tell ROS that we
-<<<<<<< HEAD
-     are ready */
-=======
      are ready */     
->>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
 //  int robotInitialized = 0; // Do not compute odometry until we have the trackWidth and distancePerCount
 
   // For PIRsensor
