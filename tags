@@ -1,0 +1,164 @@
+!_TAG_FILE_FORMAT	1	/original ctags format/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ARLO_SAFETYOVERIDE_H	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.h	10
+BATT_SAMPLES	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	243
+BatteryVolts	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^float BatteryVolts=12.0, RawBatVolts=4.0;$/
+CH_BATT	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	242
+CommandedAngularVelocity	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double CommandedAngularVelocity = 0.0;$/
+CommandedVelocity	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double CommandedVelocity = 0.0;$/
+DECREASE_THROTTLE_RATE	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	32
+EMULATE_ROS	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	4
+Escaping	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int Escaping = 0;$/
+FIRST_FRONT_IR_SENSOR_NUMBER	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	81
+FIRST_FRONT_PING_SENSOR_NUMBER	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	66
+FIRST_PING_SENSOR_PIN	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	37
+FIRST_REAR_PING_SENSOR_NUMBER	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	74
+FRONT_CENTER_HALT_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	120
+FRONT_CENTER_IR_HALT_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	179
+FRONT_CENTER_IR_SENSOR	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	178
+FRONT_CENTER_IR_SLOWDWN_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	180
+FRONT_CENTER_SENSOR	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	119
+FRONT_CENTER_SLOWDWN_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	121
+FRONT_NEAR_LEFT_HALT_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	115
+FRONT_NEAR_LEFT_SENSOR	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	114
+FRONT_NEAR_LEFT_SLOWDWN_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	116
+FRONT_NEAR_RIGHT_HALT_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	124
+FRONT_NEAR_RIGHT_SENSOR	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	123
+FRONT_NEAR_RIGHT_SLOWDWN_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	125
+HOW_MANY_FRONT_IR_SENSORS	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	83
+HOW_MANY_FRONT_PING_SENSORS	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	69
+HOW_MANY_REAR_PING_SENSORS	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	76
+Heading	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;$/
+INCREASE_THROTTLE_RATE	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	31
+IR_MAX_DISTANCE	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	22
+IRstartSlowDownDistance	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^int IRstartSlowDownDistance[NUMBER_OF_IR_SENSORS];$/
+MAXIMUM_SPEED	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	27
+MAX_DISTANCE	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	18
+MCP3008_CLK_PIN	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	46
+MCP3008_CS_PIN	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	44
+MCP3008_DINOUT_PIN	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	45
+MCP3008_REFERENCE_VOLTAGE	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	48
+MINIMUM_SPEED	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	25
+NB_SAMPLE	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	50
+NUMBER_OF_IR_ON_MCP3008	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	43
+NUMBER_OF_IR_SENSORS	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	60
+NUMBER_OF_PING_SENSORS	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	58
+Omega	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;$/
+REAR_CENTER_HALT_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	141
+REAR_CENTER_SENSOR	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	140
+REAR_CENTER_SLOWDWN_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	142
+REAR_NEAR_LEFT_HALT_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	136
+REAR_NEAR_LEFT_SENSOR	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	135
+REAR_NEAR_LEFT_SLOWDWN_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	137
+REAR_NEAR_RIGHT_HALT_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	145
+REAR_NEAR_RIGHT_SENSOR	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	144
+REAR_NEAR_RIGHT_SLOWDWN_DIST	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	146
+ROS	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^void ROS()$/
+ROStimeout	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	286
+RXBUFFERLEN	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	37
+RawBatVolts	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^float BatteryVolts=12.0, RawBatVolts=4.0;$/
+SharpIR_sort	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_Ir.c	/^void SharpIR_sort(int a[], int size) {$/
+V	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;$/
+X	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;$/
+Y	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;$/
+abdR_speedLimit	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^int abdR_speedLimit = MAXIMUM_SPEED; \/\/ Reverse speed limit to allow robot to reverse fast if it is blocked in front and visa versa$/
+abd_speedLimit	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^int abd_speedLimit = MAXIMUM_SPEED;$/
+angularVelocityOffset	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double angularVelocityOffset = 0.0, expectedLeftSpeed = 0.0, expectedRightSpeed = 0.0;$/
+ard_dhb10_arlo	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^fdserial *ard_dhb10_arlo;$/
+ard_opened	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^int ard_opened         = ARD_DEFAULT_OPENED;$/
+ard_servo_pin_L	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^int ard_servo_pin_L    = ARD_DEFAULT_SERVO_L;$/
+ard_servo_pin_R	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^int ard_servo_pin_R    = ARD_DEFAULT_SERVO_R;$/
+check_input	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^int check_input(fdserial *term)$/
+clearTwistRequest	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^void clearTwistRequest() {$/
+cliff	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int cliff = 0;$/
+cog	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/sequencer.c	/^static volatile int t, dt, cog;               \/\/ Global var for cogs to share$/
+curLeftspeed	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^int curLeftspeed = 0, curRightSpeed =0;$/
+curRightSpeed	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^int curLeftspeed = 0, curRightSpeed =0;$/
+debugModeOn	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	12
+delay	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^void delay(int us)$/
+delimiter	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^const char delimiter[2] = ","; \/\/ Delimiter character for incoming messages from the ROS Python script$/
+deltaDistance	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;$/
+dhb10OverloadPause	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	277
+dhb10_reply	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^char dhb10_reply[DHB10_LEN];$/
+dhb10_send	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^int dhb10_send(char *CmdStr)$/
+distancePerCount	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double distancePerCount = 0.0, trackWidth = 0.0;$/
+drive_close	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^void drive_close(void)$/
+drive_get_dist	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^int drive_get_dist(int *left,int *right)$/
+drive_get_head	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^int drive_get_head(int *heading)$/
+drive_get_spd	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^int drive_get_spd(int *left,int *right)$/
+drive_open	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^char *drive_open(void)$/
+drive_rst	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^int drive_rst()$/
+drive_set_gospd	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^int drive_set_gospd(int left,int right)$/
+drive_set_stop	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_DBH-10.c	/^int drive_set_stop()$/
+dt	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/sequencer.c	/^static volatile int t, dt, cog;               \/\/ Global var for cogs to share$/
+escapeLeftSpeed	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int escapeLeftSpeed = 0;$/
+escapeRightSpeed	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int escapeRightSpeed = 0;$/
+expectedLeftSpeed	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double angularVelocityOffset = 0.0, expectedLeftSpeed = 0.0, expectedRightSpeed = 0.0;$/
+expectedRightSpeed	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double angularVelocityOffset = 0.0, expectedLeftSpeed = 0.0, expectedRightSpeed = 0.0;$/
+floorArray	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_Ping.c	/^int floorArray[NUMBER_OF_FLOOR_SENSORS] = {0};$/
+floorO	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int floorO = 0;$/
+got_one	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^static int got_one = 0;$/
+gyroHeading	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^static double gyroHeading = 0.0;$/
+haltDistance	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^int haltDistance[NUMBER_OF_PING_SENSORS];$/
+hasFrontIRSensors	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	79
+hasFrontPingSensors	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	64
+hasMCP3008	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	40
+hasPowerMonitorCircuit	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	239
+hasRearPingSensors	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	72
+ignoreCliffSensors	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int ignoreCliffSensors = 0;$/
+ignoreFloorSensors	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int ignoreFloorSensors = 0;$/
+ignoreIRSensors	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int ignoreIRSensors = 0;$/
+ignoreProximity	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int ignoreProximity = 0;$/
+in_buf	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^static char in_buf[RXBUFFERLEN];\/\/ A Buffer long enough to hold the longest line ROS may send.$/
+irArray	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_Ping.c	/^int irArray[NUMBER_OF_IR_SENSORS] = {0};$/
+main	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^int main()$/
+mainLoopPause	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/per_robot_settings_for_propeller_c_code.h	279
+mcp3008_IR_cm	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_Ir.c	/^int mcp3008_IR_cm(int channel) {$/
+minDistanceSensor	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int minDistanceSensor = 0;$/
+pars_input	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^void pars_input()$/
+pinHigh	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^void pinHigh(int pin)$/
+pinInput	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^void pinInput(int pin)$/
+pinLow	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^void pinLow(int pin)$/
+pinOutput	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^void pinOutput(int pin)$/
+pinPulseHL	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^void pinPulseHL(int pin, int d, int d1)$/
+pinPulseLH	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^void pinPulseLH(int pin, int d, int d1)$/
+pinRead	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^int pinRead(int pin)$/
+pinWrite	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^int pinWrite(int pin, int state)$/
+pingArray	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_Ping.c	/^int pingArray[NUMBER_OF_PING_SENSORS] = {0};$/
+ping_cog	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_Ping.c	/^static volatile int ping_cog;$/
+ping_stack	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_Ping.c	/^static int ping_stack[128]; \/\/ If things get weird make this number bigger!$/
+ping_start	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_Ping.c	/^int ping_start()$/
+ping_stop	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_Ping.c	/^void ping_stop()$/
+pluggedIn	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int pluggedIn = 0;$/
+pollPingSensors	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_Ping.c	/^void pollPingSensors(void *par) {$/
+readADC	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^int readADC(int channel, int dinout, int clk, int cs)$/
+readADCAverage	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_mcp3008.c	/^int readADCAverage(int channel, int dinout, int clk, int cs, int samples)$/
+robotInitialized	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^int robotInitialized=0;$/
+rstack	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^uint32_t rstack[40+25];$/
+rx_buf	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^static char rx_buf[RXBUFFERLEN];\/\/ A Buffer long enough to hold the longest line ROS may send.$/
+rx_count	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^static int rx_count = 0;$/
+safeToProceed	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int safeToProceed = 0;$/
+safeToRecede	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int safeToRecede = 0;$/
+safetyOverride	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^void safetyOverride(void *par) {$/
+safetyOverride_Stack	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^static int safetyOverride_Stack[128]; \/\/ If things get weird make this number bigger!$/
+safetyOverride_start	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^int safetyOverride_start()$/
+safetyOverride_stop	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^void safetyOverride_stop()$/
+safety_Overridecog	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^static volatile int safety_Overridecog;$/
+safty_check	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^int safty_check(double CVel,double *LeftSpeed,double *RightSpeed)$/
+sensorbuf	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^static char sensorbuf[132];$/
+sequencer	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/sequencer.c	/^void sequencer(void *par)                      $/
+sequencer_get	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/sequencer.c	/^int sequencer_get()$/
+sequencer_reset	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/sequencer.c	/^void sequencer_reset()$/
+sequencer_set	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/sequencer.c	/^void sequencer_set(int newTime)$/
+sequencer_start	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/sequencer.c	/^int sequencer_start()$/
+sequencer_stop	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/sequencer.c	/^void sequencer_stop()$/
+stack	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/sequencer.c	/^static unsigned int stack[40 + 25];           \/\/ Stack vars for other cog$/
+startSlowDownDistance	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^int startSlowDownDistance[NUMBER_OF_PING_SENSORS];$/
+t	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/sequencer.c	/^static volatile int t, dt, cog;               \/\/ Global var for cogs to share$/
+term	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^fdserial *term;$/
+trackWidth	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/TimingTest.c	/^double distancePerCount = 0.0, trackWidth = 0.0;$/
+wasEscaping	/Users/Jack/Documents/SimpleIDE/My Projects/Arlo_Timing_Test/Arlo_SafetyOverride.c	/^volatile int wasEscaping = 0;$/

@@ -13,19 +13,19 @@
 extern "C" { 
 #endif
 
-extern volatile int safeToProceed ,
-safeToRecede,
-cliff,
-floorO,
-Escaping,
-escapeLeftSpeed,
-escapeRightSpeed,
-minDistanceSensor,
-ignoreProximity,
-ignoreCliffSensors,
-ignoreFloorSensors,
-ignoreIRSensors,
-pluggedIn;
+extern volatile int safeToProceed;
+extern volatile int safeToRecede;
+extern volatile int cliff;
+extern volatile int floorO;
+extern volatile int Escaping;
+extern volatile int escapeLeftSpeed;
+extern volatile int escapeRightSpeed;
+extern volatile int minDistanceSensor;
+extern volatile int ignoreProximity;
+extern volatile int ignoreCliffSensors;
+extern volatile int ignoreFloorSensors;
+extern volatile int ignoreIRSensors;
+extern volatile int pluggedIn;
 
 
 

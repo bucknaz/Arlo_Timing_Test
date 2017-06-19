@@ -4,11 +4,12 @@
 #define EMULATE_ROS
 
 //If the DHB-10 is not present set this to test code
-#define EMULATE_ARLO
+//#define EMULATE_ARLO
 
 //Set this to emit odometry
-#define enableOutput // Do NOT comment this out when running ROS!
+//#define enableOutput // Do NOT comment this out when running ROS!
 
+#define debugModeOn
 
 
 // PROXIMITY SENSOR TUNING
@@ -21,7 +22,7 @@
 #define IR_MAX_DISTANCE 50
 
 // What is the minimum speed that the speed limiter should set the robot to?
-#define MINIMUM_SPEED 10
+#define MINIMUM_SPEED 20
 // Maximum speed in ticks per second. Even if ROS asks us to go faster, we will not.
 #define MAXIMUM_SPEED 200 // 200 is default in arlodrive too, but we may change it.
 
@@ -282,7 +283,7 @@ Remember though that going faster and "hanging" isn't more responsive.
 has not received a twist command from ROS.
 The loop speed is determined by the above two settings, so it isn't a strict time.
 */
-#define ROStimeout 10 // 10 = about 1 second if dhb10OverloadPause === 2 && mainLoopPause === 10
+#define ROStimeout 60 // 10 = about 1 second if dhb10OverloadPause === 2 && mainLoopPause === 10
 
 /* Enable this to turn on extra debugging information,
 for use with the
@@ -290,7 +291,6 @@ for use with the
 script.
 Do not try to use it with ROS, as the extra output will confuse it. */
 
-//#define debugModeOn
 
 /* You can disable this for use with the
 ~/catkin_ws/src/ArloBot/scripts/direct2PropSerialTest.sh

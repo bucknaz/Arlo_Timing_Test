@@ -10,10 +10,6 @@
 extern double BatteryVolts;
 extern double RawBatVolts;
 
-// Local Sensor Polling Cog
-static volatile int cog;
-static int pstack[128]; // If things get weird make this number bigger!
-
 // Global Storage for PING & IR Sensor Data:
 int pingArray[NUMBER_OF_PING_SENSORS] = {0};
 int irArray[NUMBER_OF_IR_SENSORS] = {0};
@@ -21,19 +17,23 @@ int irArray[NUMBER_OF_IR_SENSORS] = {0};
 int floorArray[NUMBER_OF_FLOOR_SENSORS] = {0};
 #endif
 
+// Local Sensor Polling Cog
+static volatile int ping_cog;
+static int ping_stack[128]; // If things get weird make this number bigger!
+
 
 int ping_start()
 {
   ping_stop();
-  cog = 1 + cogstart(&pollPingSensors, NULL, pstack, sizeof pstack);
+  ping_cog = 1 + cogstart(&pollPingSensors, NULL, ping_stack, sizeof ping_stack);
 }
 
 void ping_stop()
 {
-  if(cog)
+  if(ping_cog)
   {
-    cogstop(cog -1);
-    cog = 0;
+    cogstop(ping_cog -1);
+    ping_cog = 0;
   }    
 }
 

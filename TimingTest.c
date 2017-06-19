@@ -16,13 +16,10 @@
 // This is the ROS io port
 fdserial *term;
 
-
 static double gyroHeading = 0.0;
 double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;
 
-
 const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
-
 
 double distancePerCount = 0.0, trackWidth = 0.0;
 double CommandedVelocity = 0.0;
@@ -34,9 +31,6 @@ int robotInitialized=0;
 // declared outside main
 int abd_speedLimit = MAXIMUM_SPEED;
 int abdR_speedLimit = MAXIMUM_SPEED; // Reverse speed limit to allow robot to reverse fast if it is blocked in front and visa versa
-
-
-
 
 
 static char sensorbuf[132];
@@ -164,8 +158,12 @@ void pars_input()
       token = strtok(NULL, delimiter);
       Heading = strtod(token, &unconverted);
       gyroHeading = Heading;
-      if (trackWidth > 0.0 && distancePerCount > 0.0)
+      if (trackWidth > 0.0 && distancePerCount > 0.0){
         robotInitialized = 1;
+        #ifdef debugModeOn
+        dprint(term, "Initalized \n");
+        #endif
+      }
     }               
   }   
 }  
@@ -229,19 +227,22 @@ int main()
   // Robot description: We will get this from ROS so that it is easier to tweak between runs without reloading the Propeller EEPROM.
   // http://learn.parallax.com/activitybot/calculating-angles-rotation
   // See ~/catkin_ws/src/ArloBot/src/arlobot/arlobot_bringup/param/arlobot.yaml to set or change this value
-  double distancePerCount = 0.0, trackWidth = 0.0;
+  distancePerCount = 0.0; 
+  trackWidth = 0.0;
 
   // For Odometry
   int ticksLeft, ticksRight, ticksLeftOld, ticksRightOld;
   double Heading = 0.0, X = 0.0, Y = 0.0, deltaDistance, deltaX, deltaY, V, Omega;
-  int speedLeft, speedRight, throttleStatus = 0, heading, deltaTicksLeft, deltaTicksRight;
+  int speedLeft, speedRight; 
+  int throttleStatus = 0;
+  int heading, deltaTicksLeft, deltaTicksRight;
   BatteryVolts = 12; //Just set it to something sane for right now
 
   /* Wait for ROS to give us the robot parameters,
      broadcasting 'i' until it does to tell ROS that we
      are ready */
-  int robotInitialized = 0; // Do not compute odometry until we have the trackWidth and distancePerCount
-
+  robotInitialized = 0; // Do not compute odometry until we have the trackWidth and distancePerCount
+   
   // For PIRsensor
   #ifdef hasPIR
   int PIRhitCounter = 0;
@@ -264,12 +265,12 @@ int main()
   }      
   // For Debugging without ROS:
   // See ~/catkin_ws/src/ArloBot/src/arlobot/arlobot_bringup/param/arlobot.yaml for most up to date values
-    
+  /*  
   trackWidth = 0.403000; // from measurement and then testing
   distancePerCount = 0.00338;
   // http://forums.parallax.com/showthread.php/154274-The-quot-Artist-quot-robot?p=1271544&viewfull=1#post1271544
   robotInitialized = 1;
-    
+  */  
   // Comment out above lines for use with ROS
 
   // Declaring variables outside of loop
@@ -281,10 +282,13 @@ int main()
   int count = 0, i = 0;
     
   // To hold received commands
-  double CommandedVelocity = 0.0;
-  double CommandedAngularVelocity = 0.0;
-  double angularVelocityOffset = 0.0, expectedLeftSpeed = 0.0, expectedRightSpeed = 0.0;
-  int curLeftspeed = 0, curRightSpeed =0;    
+  CommandedVelocity = 0.0;
+  CommandedAngularVelocity = 0.0;
+  angularVelocityOffset = 0.0; 
+  expectedLeftSpeed = 0.0; 
+  expectedRightSpeed = 0.0;
+  curLeftspeed = 0; 
+  curRightSpeed =0;    
     
   // Listen for drive commands
   int timeoutCounter = 0;
@@ -303,6 +307,9 @@ int main()
       pars_input(); //5ms
       got_one = 0;
       timeoutCounter = 0;
+      #ifdef debugModeOn
+       
+      #endif
     }// Timout code needs to be though out better    
     else if (timeoutCounter > ROStimeout) 
     {
@@ -312,7 +319,7 @@ int main()
         expectedLeftSpeed = 0;
         expectedRightSpeed = 0;
         clearTwistRequest();
-        timeoutCounter = ROStimeout; // Prevent runaway integer length          
+        timeoutCounter = 0; //ROStimeout; // Prevent runaway integer length          
     }     
     
       
@@ -328,6 +335,9 @@ int main()
 
     if ( safty_check(CommandedVelocity,&expectedLeftSpeed,&expectedRightSpeed) )
     {
+      #ifdef debugModeOn
+      //dprint(term, "Safty_Check l=%f r=%f\n",expectedLeftSpeed,expectedRightSpeed );  
+      #endif
       clearTwistRequest();//ignore twist msg if we are escaping or blocked
     }    
               
@@ -342,6 +352,9 @@ int main()
       {
         ;// handle error
       }    
+      #ifdef debugModeOn
+      dprint(term, "go speed l=%d r=%d\n",curLeftspeed,curRightSpeed );
+      #endif
     }        
 
 
@@ -350,6 +363,9 @@ int main()
        The rest was heavily inspired/copied from here:
        http://forums.parallax.com/showthread.php/154963-measuring-speed-of-the-ActivityBot?p=1260800&viewfull=1#post1260800
     */
+    #ifdef debugModeOn
+    //dprint(term, "state =  %d\n",state);
+    #endif
 
     switch(state)
     {
@@ -358,44 +374,53 @@ int main()
       
         if(!robotInitialized)
         {
-          // Request Robot distancePerCount and trackWidth 
-          //NOTE: Python code cannot deal with a line with no divider characters on it.
-          #ifdef hasPIR
-          dprint(term, "i\t%d\n", personDetected);
-          #else
-          dprint(term, "i\t0\n");
-          #endif 
           state = -1; //We increment after switch putting us back to 0
-          
-          //Copied from origional code, should be reworked.
-          #ifdef hasPIR
-          int PIRstate = 0;
-          for (i = 0; i < 5; i++) // 5 x 200ms pause = 1000 between updates
+          throttleStatus++;
+          if(throttleStatus > 30)
           {
-            PIRstate = input(PIR_PIN); // Check sensor (1) motion, (0) no motion
-            // Count positive hits and make a call:
-            if (PIRstate == 0) 
+            // Request Robot distancePerCount and trackWidth 
+            //NOTE: Python code cannot deal with a line with no divider characters on it.
+            #ifdef hasPIR
+            dprint(term, "i\t%d\n", personDetected);
+            #else
+            dprint(term, "i\t0\n");
+            #endif 
+            
+          
+            //Copied from origional code, should be reworked.
+            #ifdef hasPIR
+            int PIRstate = 0;
+            for (i = 0; i < 5; i++) // 5 x 200ms pause = 1000 between updates
             {
-              PIRhitCounter = 0;
-            } 
-            else 
-            {
+              PIRstate = input(PIR_PIN); // Check sensor (1) motion, (0) no motion
+              // Count positive hits and make a call:
+              if (PIRstate == 0) 
+              {
+                PIRhitCounter = 0;
+              } 
+              else 
+              {
               PIRhitCounter++; // Increment on each positive hit
+              }
+              if (PIRhitCounter > personThreshhold) 
+              {
+                personDetected = 1;
+              } 
+              else 
+              {
+                personDetected = 0;
+              }
+              pause(200); // Pause 1/5 second before repeat
             }
-            if (PIRhitCounter > personThreshhold) 
-            {
-              personDetected = 1;
-            } 
-            else 
-            {
-              personDetected = 0;
-            }
-            pause(200); // Pause 1/5 second before repeat
+            #endif 
+            throttleStatus=0;         
           }
-          #endif          
-        }          
+        }                 
         else
         {//Start ping code etc.
+          #ifdef debugModeOn
+          dprint(term, "Starting Cogs\n");
+          #endif
           // Start the local sensor polling cog
           ping_start();
     
@@ -407,7 +432,8 @@ int main()
           // Start safetyOverride cog: (AFTER the Motors are initialized!)
           safetyOverride_start();     
           
-          timeoutCounter = 0;//clear timeout counter     
+          timeoutCounter = 0;//clear timeout counter  
+           
         }          
         break;
         
@@ -512,7 +538,11 @@ int main()
 
       case 7:// xmit status       16ms
         // Send a regular "status" update to ROS including information that does not need to be refreshed as often as the odometry.
-        dprint(term, "s\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\t%.2f\t%d\t%d\n", safeToProceed, safeToRecede, Escaping, abd_speedLimit, abdR_speedLimit, minDistanceSensor, BatteryVolts, RawBatVolts, cliff, floorO);
+        dprint(term, "s\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\t%.2f\t%d\t%d\n", 
+                  safeToProceed, safeToRecede, Escaping, abd_speedLimit, 
+                  abdR_speedLimit, minDistanceSensor, 
+                  BatteryVolts, RawBatVolts, 
+                  cliff, floorO);
         throttleStatus = 0;
         state = 0; //We increment after switch
 //        tm +=  sequencer_get(); // ~1ms or less    
@@ -562,7 +592,7 @@ sequencer_reset();
 void ROS()
 {
  //pretend we are ROS and stuff the buffer 
- pause(1000); 
+ pause(3000); 
  strcpy(in_buf,"d,0.403,0.00338,0,0,0,0,0,0.0,0.0,0.0\r");// A Buffer long enough to hold the longest line ROS may send.
  got_one = 1; 
  pause(1000);

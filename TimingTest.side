@@ -5,6 +5,8 @@ Arlo_SafetyOverride.c
 Arlo_Ping.c
 Arlo_Ir.c
 Arlo_mcp3008.c
+per_robot_settings_for_propeller_c_code.h
+Arlo_SafetyOverride.h
 >compiler=C
 >memtype=cmm main ram compact
 >optimize=-Os

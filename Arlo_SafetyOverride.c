@@ -11,28 +11,28 @@ extern int abd_speedLimit;
 extern int abdR_speedLimit;
 
 // For "Safety Override" Cog
-volatile int safeToProceed = 0,
-safeToRecede = 0,
-cliff = 0,
-floorO = 0,
-Escaping = 0,
-escapeLeftSpeed = 0,
-escapeRightSpeed = 0,
-minDistanceSensor = 0,
-ignoreProximity = 0,
-ignoreCliffSensors = 0,
-ignoreFloorSensors = 0,
-ignoreIRSensors = 0,
-pluggedIn = 0,
-wasEscaping = 0;
+volatile int safeToProceed = 0;
+volatile int safeToRecede = 0;
+volatile int cliff = 0;
+volatile int floorO = 0;
+volatile int Escaping = 0;
+volatile int escapeLeftSpeed = 0;
+volatile int escapeRightSpeed = 0;
+volatile int minDistanceSensor = 0;
+volatile int ignoreProximity = 0;
+volatile int ignoreCliffSensors = 0;
+volatile int ignoreFloorSensors = 0;
+volatile int ignoreIRSensors = 0;
+volatile int pluggedIn = 0;
+volatile int wasEscaping = 0;
 
 // This can use proximity sensors to detect obstacles (including people) and cliffs
 // This can use the gyro to detect tipping
 // This can use the gyro to detect significant heading errors due to slipping wheels when an obstacle is encountered or high centered
 
 // Local Sensor Polling Cog
-static volatile int cog;
-static int safetyOverrideStack[128]; // If things get weird make this number bigger!
+static volatile int safety_Overridecog;
+static int safetyOverride_Stack[128]; // If things get weird make this number bigger!
 
 /* Here you set up arrays showing what the halt distance,
    and distance to start slowing down is for each sensor.
@@ -155,15 +155,15 @@ int safetyOverride_start()
   startSlowDownDistance[REAR_FAR_RIGHT_IR_SENSOR] = REAR_FAR_RIGHT_IR_SLOWDWN_DIST;
   #endif
   
-  cog = 1 + cogstart(&safetyOverride, NULL, safetyOverrideStack, sizeof safetyOverrideStack);
+  safety_Overridecog = 1 + cogstart(&safetyOverride, NULL, safetyOverride_Stack, sizeof safetyOverride_Stack);
 }
 
 void safetyOverride_stop()
 {
-  if(cog)
+  if(safety_Overridecog)
   {
-    cogstop(cog -1);
-    cog = 0;
+    cogstop(safety_Overridecog -1);
+    safety_Overridecog = 0;
   }    
 }
 

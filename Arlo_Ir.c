@@ -8,6 +8,7 @@
 #ifdef hasMCP3008
 // Sort an array
 
+
 void SharpIR_sort(int a[], int size) {
     for(int i=0; i<(size-1); i++) {
         bool flag = true;
