@@ -8,11 +8,9 @@
 
 //Set this to emit odometry
 //#define enableOutput // Do NOT comment this out when running ROS!
-<<<<<<< HEAD
 =======
 
 #define debugModeOn
->>>>>>> 9bfe4b7e4e9afd01d8636e79a3b012a350f61ba0
 
 #define debugModeOn
 
