@@ -2,6 +2,8 @@
   Blank Simple Project.c
   http://learn.parallax.com/propeller-c-tutorials 
 */
+
+
 #include "simpletools.h"                      // Include simple tools
 #include "fdserial.h"
 
@@ -19,6 +21,13 @@
 // This is the ROS io port
 fdserial *term;
 
+<<<<<<< HEAD
+static double gyroHeading = 0.0;
+double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;
+
+const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
+
+=======
 <<<<<<< HEAD
 =======
 //used for input string processing
@@ -40,6 +49,7 @@ static double gyroHeading = 0.0;
 const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
 
 <<<<<<< HEAD
+>>>>>>> 9bfe4b7e4e9afd01d8636e79a3b012a350f61ba0
 double distancePerCount = 0.0, trackWidth = 0.0;
 =======
 double Heading = 1.0;
@@ -65,6 +75,9 @@ int abd_speedLimit = MAXIMUM_SPEED;
 int abdR_speedLimit = MAXIMUM_SPEED; // Reverse speed limit to allow robot to reverse fast if it is blocked in front and visa versa
 
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 9bfe4b7e4e9afd01d8636e79a3b012a350f61ba0
 
 static char sensorbuf[132];
 #define RXBUFFERLEN 40
@@ -206,9 +219,13 @@ void pars_input()
 <<<<<<< HEAD
       if (trackWidth > 0.0 && distancePerCount > 0.0){
 =======
+<<<<<<< HEAD
+      if (trackWidth > 0.0 && distancePerCount > 0.0){
+=======
       #endif
       if (trackWidth > 0.0 && distancePerCount > 0.0)
 >>>>>>> 63a47b2f34da71d6dadd6ed724d751289d90be32
+>>>>>>> 9bfe4b7e4e9afd01d8636e79a3b012a350f61ba0
         robotInitialized = 1;
         #ifdef debugModeOn
         dprint(term, "Initalized \n");
@@ -277,6 +294,9 @@ int main()
   // http://learn.parallax.com/activitybot/calculating-angles-rotation
   // See ~/catkin_ws/src/ArloBot/src/arlobot/arlobot_bringup/param/arlobot.yaml to set or change this value
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 9bfe4b7e4e9afd01d8636e79a3b012a350f61ba0
   distancePerCount = 0.0; 
   trackWidth = 0.0;
 
@@ -286,6 +306,8 @@ int main()
   int speedLeft, speedRight; 
   int throttleStatus = 0;
   int heading, deltaTicksLeft, deltaTicksRight;
+<<<<<<< HEAD
+=======
 =======
 //  double distancePerCount = 0.0, trackWidth = 0.0;
 
@@ -296,6 +318,7 @@ int main()
   int throttleStatus = 0;
   int heading;
 >>>>>>> 63a47b2f34da71d6dadd6ed724d751289d90be32
+>>>>>>> 9bfe4b7e4e9afd01d8636e79a3b012a350f61ba0
   BatteryVolts = 12; //Just set it to something sane for right now
 
   /* Wait for ROS to give us the robot parameters,
@@ -305,9 +328,14 @@ int main()
   robotInitialized = 0; // Do not compute odometry until we have the trackWidth and distancePerCount
    
 =======
+<<<<<<< HEAD
+  robotInitialized = 0; // Do not compute odometry until we have the trackWidth and distancePerCount
+   
+=======
 //  int robotInitialized = 0; // Do not compute odometry until we have the trackWidth and distancePerCount
 
 >>>>>>> 63a47b2f34da71d6dadd6ed724d751289d90be32
+>>>>>>> 9bfe4b7e4e9afd01d8636e79a3b012a350f61ba0
   // For PIRsensor
   #ifdef hasPIR
   int PIRhitCounter = 0;
