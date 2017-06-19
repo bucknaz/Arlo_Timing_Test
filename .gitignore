@@ -1,0 +1,5 @@
+cmm/*
+*.back
+*.elf
+*.binary
+.DS_Store
