@@ -2,6 +2,8 @@
   Blank Simple Project.c
   http://learn.parallax.com/propeller-c-tutorials 
 */
+
+
 #include "simpletools.h"                      // Include simple tools
 #include "fdserial.h"
 
@@ -21,6 +23,12 @@ fdserial *term;
 
 <<<<<<< HEAD
 =======
+static double gyroHeading = 0.0;
+double Heading = 1.0, X = 0.0, Y = 0.0, deltaDistance, V, Omega;
+
+const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
+
+>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
 //used for input string processing
 #define RXBUFFERLEN 40
 static char rx_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
@@ -33,15 +41,15 @@ static char sensorbuf[132];
 
 
 #ifdef hasGyro
->>>>>>> 63a47b2f34da71d6dadd6ed724d751289d90be32
 static double gyroHeading = 0.0;
 #endif
 
 const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
 
 <<<<<<< HEAD
-double distancePerCount = 0.0, trackWidth = 0.0;
 =======
+double distancePerCount = 0.0, trackWidth = 0.0;
+>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
 double Heading = 1.0;
 double X = 0.0;
 double Y = 0.0;
@@ -50,7 +58,6 @@ double V;
 double Omega;
 double distancePerCount = 0.0;
 double trackWidth = 0.0;
->>>>>>> 63a47b2f34da71d6dadd6ed724d751289d90be32
 double CommandedVelocity = 0.0;
 double CommandedAngularVelocity = 0.0;
 double angularVelocityOffset = 0.0;
@@ -65,6 +72,7 @@ int abd_speedLimit = MAXIMUM_SPEED;
 int abdR_speedLimit = MAXIMUM_SPEED; // Reverse speed limit to allow robot to reverse fast if it is blocked in front and visa versa
 
 <<<<<<< HEAD
+=======
 
 static char sensorbuf[132];
 #define RXBUFFERLEN 40
@@ -74,10 +82,9 @@ static int rx_count = 0;
 static int got_one = 0;
 
 float BatteryVolts=12.0, RawBatVolts=4.0;
-=======
+>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
 double BatteryVolts=12.0;
 double RawBatVolts=4.0;
->>>>>>> 63a47b2f34da71d6dadd6ed724d751289d90be32
 
 
 //Stack for ros emulater
@@ -203,12 +210,12 @@ void pars_input()
       Heading = strtod(token, &unconverted);
       #ifdef hasGyro
       gyroHeading = Heading;
+      #endif
 <<<<<<< HEAD
       if (trackWidth > 0.0 && distancePerCount > 0.0){
 =======
-      #endif
       if (trackWidth > 0.0 && distancePerCount > 0.0)
->>>>>>> 63a47b2f34da71d6dadd6ed724d751289d90be32
+>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
         robotInitialized = 1;
         #ifdef debugModeOn
         dprint(term, "Initalized \n");
@@ -277,6 +284,7 @@ int main()
   // http://learn.parallax.com/activitybot/calculating-angles-rotation
   // See ~/catkin_ws/src/ArloBot/src/arlobot/arlobot_bringup/param/arlobot.yaml to set or change this value
 <<<<<<< HEAD
+=======
   distancePerCount = 0.0; 
   trackWidth = 0.0;
 
@@ -286,7 +294,7 @@ int main()
   int speedLeft, speedRight; 
   int throttleStatus = 0;
   int heading, deltaTicksLeft, deltaTicksRight;
-=======
+>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
 //  double distancePerCount = 0.0, trackWidth = 0.0;
 
   // For Odometry
@@ -295,19 +303,17 @@ int main()
   int speedLeft, speedRight, deltaX, deltaY, deltaTicksLeft, deltaTicksRight;
   int throttleStatus = 0;
   int heading;
->>>>>>> 63a47b2f34da71d6dadd6ed724d751289d90be32
   BatteryVolts = 12; //Just set it to something sane for right now
 
   /* Wait for ROS to give us the robot parameters,
      broadcasting 'i' until it does to tell ROS that we
-     are ready */
 <<<<<<< HEAD
-  robotInitialized = 0; // Do not compute odometry until we have the trackWidth and distancePerCount
-   
+     are ready */
 =======
+     are ready */     
+>>>>>>> 131a8ed354a229ef6c2d37705dc00bb7b935bc6a
 //  int robotInitialized = 0; // Do not compute odometry until we have the trackWidth and distancePerCount
 
->>>>>>> 63a47b2f34da71d6dadd6ed724d751289d90be32
   // For PIRsensor
   #ifdef hasPIR
   int PIRhitCounter = 0;

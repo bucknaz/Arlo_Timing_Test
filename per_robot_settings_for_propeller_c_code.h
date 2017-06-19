@@ -8,9 +8,11 @@
 
 //Set this to emit odometry
 //#define enableOutput // Do NOT comment this out when running ROS!
+=======
 
 #define debugModeOn
 
+#define debugModeOn
 
 // PROXIMITY SENSOR TUNING
 // Use these to tune the robots responses!

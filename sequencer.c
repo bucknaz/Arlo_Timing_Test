@@ -1,6 +1,5 @@
 
 
-
 #include "simpletools.h"                      // Include simpletools
 #include "sequencer.h"
 
