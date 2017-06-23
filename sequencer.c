@@ -13,6 +13,7 @@ int sequencer_start()
 {
   sequencer_stop();
   cog = 1 + cogstart(sequencer, NULL, stack, sizeof(stack));
+  return(cog);
 }
 
 void sequencer_stop()

@@ -34,8 +34,8 @@ int mcp3008_IR_cm(int channel) {
 
     int ir_val[NB_SAMPLE];
     int distanceCM;
-    int i=0;
-    float current;
+    //int i=0;
+    //float current;
 
     for (int i=0; i<NB_SAMPLE; i++){
         // Read analog value

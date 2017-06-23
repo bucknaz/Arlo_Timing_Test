@@ -7,6 +7,9 @@
 #include "Arlo_SafetyOverride.h"
 #include "Arlo_Ping.h"
 
+//#include "fdserial.h"
+//extern fdserial *term;
+
 extern int abd_speedLimit;
 extern int abdR_speedLimit;
 
@@ -18,7 +21,6 @@ volatile int floorO = 0;
 volatile int Escaping = 0;
 volatile int escapeLeftSpeed = 0;
 volatile int escapeRightSpeed = 0;
-volatile int minDistanceSensor = 0;
 volatile int ignoreProximity = 0;
 volatile int ignoreCliffSensors = 0;
 volatile int ignoreFloorSensors = 0;
@@ -156,6 +158,7 @@ int safetyOverride_start()
   #endif
   
   safety_Overridecog = 1 + cogstart(&safetyOverride, NULL, safetyOverride_Stack, sizeof safetyOverride_Stack);
+  return(safety_Overridecog);
 }
 
 void safetyOverride_stop()
@@ -168,7 +171,7 @@ void safetyOverride_stop()
 }
 
 
-
+// returns 1 if speeds modifyed else 0
 int safty_check(double CVel,double *LeftSpeed,double *RightSpeed)
 {
   int results = 0;
@@ -187,7 +190,7 @@ int safty_check(double CVel,double *LeftSpeed,double *RightSpeed)
     *RightSpeed = 0;
     results = 1;
   } 
-  else if((CVel > 0 && safeToProceed == 0) || (CVel < 0 && safeToRecede == 0) ) 
+  else if((CVel > 0 && safeToProceed == 1) || (CVel < 0 && safeToRecede == 1) ) 
   {
     *LeftSpeed = 0;
     *RightSpeed = 0;
@@ -221,10 +224,20 @@ void safetyOverride(void *par) {
 
     int increaseThrottleRamp = 0;
     int decreaseThrottleRamp = 0;
+    int minDistanceSensor = 0;
+
     // Declare all variables up front so they do not have to be created in the loop, only set.
     // This may or may not improve performance.
     int blockedSensor[NUMBER_OF_PING_SENSORS] = {0};
-    int i, blockedF = 0, blockedR = 0, foundCliff = 0, floorObstacle = 0, pleaseEscape = 0, minDistance = 255, minRDistance = 255, newSpeedLimit = MAXIMUM_SPEED;
+    int i, blockedF = 0, blockedR = 0,  pleaseEscape = 0;
+    #if defined hasCliffSensors
+    int foundCliff = 0;
+    #endif
+    #if defined hasFloorObstacleSensors 
+    floorObstacle = 0;
+    #endif 
+    
+    int minDistance = 255, minRDistance = 255, newSpeedLimit = MAXIMUM_SPEED;
     while (1) {
         if (ignoreProximity == 0) {
             // Reset blockedSensor array to all zeros.
@@ -234,7 +247,8 @@ void safetyOverride(void *par) {
             pleaseEscape = 0;
             minDistance = 255;
             minRDistance = 255;
-
+            minDistanceSensor = 0;
+            
             #ifdef hasCliffSensors
             foundCliff = 0;
             if (ignoreCliffSensors == 0) {
@@ -298,8 +312,8 @@ void safetyOverride(void *par) {
                     }
                     // For speed restriction:
                     if (pingArray[i] < minDistance) {
-                        minDistance = pingArray[i];
-                        minDistanceSensor = i;
+                      minDistance = pingArray[i];
+                      minDistanceSensor = i;
                     }
                 }
             }
@@ -345,10 +359,11 @@ void safetyOverride(void *par) {
                     }
                     // For speed restriction:
                     if (pingArray[i] < minRDistance) {
-                        minRDistance = pingArray[i];
-                        minDistanceSensor = i;
+                      minRDistance = pingArray[i];
+                      minDistanceSensor = i;
                     }
                 }
+
             }
             #endif
 
@@ -368,7 +383,7 @@ void safetyOverride(void *par) {
                         minRDistance = pingArray[i];
                         minDistanceSensor = i;
                     }
-                }
+                }                                
             }
             #endif
 
@@ -390,10 +405,11 @@ void safetyOverride(void *par) {
                       }
                       // For speed restriction:
                       if (irArray[i] < minDistance) {
-                          minDistance = irArray[i];
-                          minDistanceSensor = i;
+                         minDistance = irArray[i];
+                         minDistanceSensor = i;
                       }
-                  }
+                  }                  
+                  
               }
               #endif
 
@@ -423,7 +439,8 @@ void safetyOverride(void *par) {
             }
 
             // Reduce Speed Limit when we are close to an obstruction
-            /* EXPLANATION minDistance won't be set unless a given sensor is closer than its particular startSlowDownDistance value, so we won't be slowing down if sensor 0 is 40, only if it is under 10 */
+            /* EXPLANATION minDistance won't be set unless a given sensor is closer than its particular 
+               startSlowDownDistance value, so we won't be slowing down if sensor 0 is 40, only if it is under 10 */
             if (minDistance < MAX_DISTANCE) {
                 // Set based on percentage of range
                 // TODO: Is this a good method?
@@ -437,18 +454,18 @@ void safetyOverride(void *par) {
                 // Ramp and limit affect of random hits
                 if (newSpeedLimit > abd_speedLimit) {
                     if (increaseThrottleRamp == INCREASE_THROTTLE_RATE) {
-                        abd_speedLimit = abd_speedLimit + 1;
+                        abd_speedLimit++;
                     }
                 } else if (newSpeedLimit < abd_speedLimit) {
                     if (decreaseThrottleRamp == DECREASE_THROTTLE_RATE) {
-                        abd_speedLimit = abd_speedLimit - 1;
+                        abd_speedLimit--;
                     }
                 }
             } else {
                 // Ramp return to full if all obstacles are clear
                 if (abd_speedLimit < MAXIMUM_SPEED) {
                     if (increaseThrottleRamp == INCREASE_THROTTLE_RATE) // Slow ramping up
-                        abd_speedLimit = abd_speedLimit + 1;
+                        abd_speedLimit++;
                 }
             }
 
@@ -477,7 +494,7 @@ void safetyOverride(void *par) {
                 // Ramp return to full if all obstacles are clear
                 if (abdR_speedLimit < MAXIMUM_SPEED) {
                     if (increaseThrottleRamp == INCREASE_THROTTLE_RATE) // Slow ramping up
-                        abdR_speedLimit = abdR_speedLimit + 1;
+                        abdR_speedLimit++;
                 }
             }
 

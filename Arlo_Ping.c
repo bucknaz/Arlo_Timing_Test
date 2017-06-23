@@ -12,7 +12,9 @@ extern double RawBatVolts;
 
 // Global Storage for PING & IR Sensor Data:
 int pingArray[NUMBER_OF_PING_SENSORS] = {0};
+
 int irArray[NUMBER_OF_IR_SENSORS] = {0};
+
 #ifdef hasFloorObstacleSensors
 int floorArray[NUMBER_OF_FLOOR_SENSORS] = {0};
 #endif
@@ -26,6 +28,7 @@ int ping_start()
 {
   ping_stop();
   ping_cog = 1 + cogstart(&pollPingSensors, NULL, ping_stack, sizeof ping_stack);
+  return(ping_cog);
 }
 
 void ping_stop()
@@ -39,7 +42,8 @@ void ping_stop()
 
 
 void pollPingSensors(void *par) {
-    int ir = 0, i;
+    int i=0;
+    //int ir = 0;
     int adc_val; //temp valu5 for calculating the battery volatage
     while (1)                                    // Repeat indefinitely
     {

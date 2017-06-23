@@ -10,7 +10,7 @@ extern "C" {
 #include "simpletools.h"                      // Include simpletools
 
 static volatile int t, dt, cog;               // Global var for cogs to share
-static unsigned int stack[40 + 25];           // Stack vars for other cog
+//static unsigned int stack[40 + 25];           // Stack vars for other cog
 
 void sequencer(void *par);                 
 int sequencer_start();

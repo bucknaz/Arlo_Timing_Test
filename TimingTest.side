@@ -7,10 +7,12 @@ Arlo_Ir.c
 Arlo_mcp3008.c
 per_robot_settings_for_propeller_c_code.h
 Arlo_SafetyOverride.h
+Arlo_DBH-10.h
 >compiler=C
 >memtype=cmm main ram compact
 >optimize=-Os
 >-m32bit-doubles
+>-Wall
 >-fno-exceptions
 >defs::-std=c99
 >-lm

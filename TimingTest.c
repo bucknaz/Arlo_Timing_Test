@@ -24,51 +24,50 @@ fdserial *term;
 //used for input string processing
 #define RXBUFFERLEN 40
 static char rx_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
-static char in_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
+char in_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
 static int rx_count = 0;
-static int got_one = 0;
+volatile int got_one = 0;
 
-//used for output string processing
-static char sensorbuf[132];
 
 
 #ifdef hasGyro
 static double gyroHeading = 0.0;
 #endif
 
-const char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
 
+//Params that can be sent when initializing
 double Heading = 0.0;
 double X = 0.0;
 double Y = 0.0;
-double deltaDistance;
-double V;
-double Omega;
 double distancePerCount = 0.0;
 double trackWidth = 0.0;
-double CommandedVelocity = 0.0;
-double CommandedAngularVelocity = 0.0;
-double angularVelocityOffset = 0.0;
-double expectedLeftSpeed = 0.0;
-double expectedRightSpeed = 0.0;
-int curLeftspeed = 0;
-int curRightSpeed =0;
 int robotInitialized=0;
 
-// declared outside main
-int abd_speedLimit = MAXIMUM_SPEED;
-int abdR_speedLimit = MAXIMUM_SPEED; // Reverse speed limit to allow robot to reverse fast if it is blocked in front and visa versa
-
-
-static char sensorbuf[132];
-
+//These get set in ping, I know wrong place
 double BatteryVolts=12.0;
 double RawBatVolts=4.0;
 
 
+//Are twist comands
+double CommandedVelocity = 0.0;
+double CommandedAngularVelocity = 0.0;
+double angularVelocityOffset = 0.0;
+
+
+// used in parse input, printed in main and adjusted in safty override cog
+volatile int abd_speedLimit = MAXIMUM_SPEED;
+volatile int abdR_speedLimit = MAXIMUM_SPEED; // Reverse speed limit to allow robot to reverse fast if it is blocked in front and visa versa
+
+
+
+
 //Stack for ros emulater
 #ifdef EMULATE_ROS
-uint32_t rstack[40+25];
+volatile double ros_t=0;
+volatile double ros_v=0;
+volatile double ros_r=.51;
+
+uint32_t rstack[80];
 void ROS();
 #endif
 
@@ -102,6 +101,23 @@ int check_input(fdserial *term)
   return(whole_line);
 }
 
+
+/*
+ *  clearTwistRequest()
+ *  
+ *  Reset the twist velocitys to 0
+ *  Sets:
+ *     CommandedVelocity, CommandedAngularVelocity, angularVelocityOffset
+ */
+void clearTwistRequest() {
+  CommandedVelocity = 0.0;
+  CommandedAngularVelocity = 0.0;
+  angularVelocityOffset = 0.0;
+}
+
+
+
+
 /*
  *  pars_input()
  *
@@ -115,6 +131,10 @@ int check_input(fdserial *term)
  */
 void pars_input()
 {
+  
+  //const 
+  char delimiter[2] = ","; // Delimiter character for incoming messages from the ROS Python script
+
   if (in_buf[0] == 's') 
   {
     char *token;
@@ -124,7 +144,8 @@ void pars_input()
     CommandedVelocity = strtod(token, &unconverted);
     token = strtok(NULL, delimiter);
     CommandedAngularVelocity = strtod(token, &unconverted);
-        angularVelocityOffset = CommandedAngularVelocity * (trackWidth * 0.5);
+
+    angularVelocityOffset = CommandedAngularVelocity * (trackWidth * 0.5);
     /* Prevent saturation at max wheel speed when a compound command is sent.
        Without this, if your max speed is 50, and ROS asks us to set
        one wheel at 50 and the other at 100, we will end up with both
@@ -145,11 +166,6 @@ void pars_input()
       CommandedVelocity = -((abdR_speedLimit * distancePerCount) - fabs(angularVelocityOffset));
     } 
 
-    // These only need to be calculated once per twist msg
-    expectedLeftSpeed =  CommandedVelocity - angularVelocityOffset;
-    expectedRightSpeed = CommandedVelocity + angularVelocityOffset;
-    expectedLeftSpeed =  expectedLeftSpeed / distancePerCount;
-    expectedRightSpeed = expectedRightSpeed / distancePerCount;                
   }     
    
   else if (in_buf[0] == 'd') 
@@ -174,7 +190,7 @@ void pars_input()
  
     #ifdef debugModeOn
     // For Debugging
-    dprint(term, "GOT D! %d %d %d %d %d\n", ignoreProximity, ignoreCliffSensors, ignoreIRSensors, ignoreFloorSensors, pluggedIn); 
+    dprint(term, "GOT D! %.3f %.3f %d %d %d %d %d\n",trackWidth,distancePerCount, ignoreProximity, ignoreCliffSensors, ignoreIRSensors, ignoreFloorSensors, pluggedIn); 
     #endif
 
     //Additional included in init message but not reconfigure
@@ -201,18 +217,6 @@ void pars_input()
 }  
 
 
-/*
- *  clearTwistRequest()
- *  
- *  Reset the twist velocitys to 0
- *  Sets:
- *     CommandedVelocity, CommandedAngularVelocity, angularVelocityOffset
- */
-void clearTwistRequest() {
-  CommandedVelocity = 0.0;
-  CommandedAngularVelocity = 0.0;
-  angularVelocityOffset = 0.0;
-}
 
 
 
@@ -231,9 +235,8 @@ int main()
   pause(1000);//Give the terminal a sec to get started
   
   sequencer_start();
-
-  rx_count = 0; // clear the input buffer  
-
+  
+  
   #ifdef EMULATE_ROS
   pingArray[0] = 23;
   pingArray[1] = 23;
@@ -242,15 +245,39 @@ int main()
   pingArray[4] = 203;
   pingArray[5] = 23;
   irArray[0] = 22;
-  deltaDistance=0;
-  Omega = 0;
-  V=0;  
+  srand(345);
   dprint(term, "Starting\n");  
   cogstart(&ROS, NULL, rstack, sizeof(rstack));
   #endif
+  
 
+  rx_count = 0; // clear the input buffer  
+
+  // setup a buffer to build the output strings in
+  char sensorbuf[132];
   memset(sensorbuf, 0, 132);
   char *curbuf = sensorbuf;  
+       
+  //used for calculating values     
+  double deltaDistance = 0;
+  double V = 0;
+  double Omega = 0;
+ 
+  //The requested speed 
+  double expectedLeftSpeed = 0;
+  double expectedRightSpeed = 0;
+     
+  //track the current speed settings
+  int curLeftspeed = 0;
+  int curRightSpeed =0;
+
+  //Track the closet Ping and Ir sensor reading       
+  int minPingDist;
+  int minPingnum = 0;
+  int minIrDist;
+  int minIrnum;
+       
+       
        
 /////////////////////////////////////////////
 //Copied from ROSInterfaceForArloBotWithDHB10
@@ -263,7 +290,7 @@ int main()
   trackWidth = 0.0;
 
   // For Odometry
-  int ticksLeft, ticksRight, ticksLeftOld, ticksRightOld;
+  int ticksLeft, ticksRight, ticksLeftOld=0, ticksRightOld=0;
   int speedLeft, speedRight, deltaX, deltaY, deltaTicksLeft, deltaTicksRight;
   int throttleStatus = 0;
   int heading;
@@ -288,8 +315,9 @@ int main()
   // Halt motors in case they are moving and reset all stats.
   if (drive_set_stop() )
   {
+    dprint(term, "drive set stop Error\n");  
     ;// handle error
-  }      
+  }   
   if ( drive_rst() )
   {
     ;// handle error
@@ -308,16 +336,18 @@ int main()
   // This may or may not improve performance
   // Some of these we want to hold and use later too
   // A Buffer long enough to hold the longest line ROS may send.
-  const int bufferLength = 35; // A Buffer long enough to hold the longest line ROS may send.
-  char buf[bufferLength];
-  int count = 0, i = 0;
+  //const int bufferLength = 35; // A Buffer long enough to hold the longest line ROS may send.
+  //char buf[bufferLength];
+  //int count = 0;
+  int i = 0;
     
   // To hold received commands
   CommandedVelocity = 0.0;
   CommandedAngularVelocity = 0.0;
   angularVelocityOffset = 0.0; 
-  expectedLeftSpeed = 0.0; 
-  expectedRightSpeed = 0.0;
+
+  expectedLeftSpeed = 0; 
+  expectedRightSpeed = 0;
   curLeftspeed = 0; 
   curRightSpeed =0;    
     
@@ -326,30 +356,50 @@ int main()
         
 //End of init from ROSInterfaceForArloBotWithDHB10  
 //////////////////////////////////////////////////
-
+//dprint(term, "Starting loop\n"); 
+ 
   while(1)
   {    
   
      timeoutCounter++;//keep track of timoutcount
      
      got_one |= check_input(term);//We or = to prevent clearing 
+     
      if(got_one){
-      //dprint(term,"%s%d",in_buf,tm);
+      #ifdef debugModeOn 
+      //dprint(term,"%s",in_buf);
+      #endif
       pars_input(); //5ms
+
+      #ifdef debugModeOn 
+      //dprint(term,"C=%.3f A=%.3f \t",CommandedVelocity,angularVelocityOffset);
+      #endif
+
+      // These only need to be calculated once per twist msg
+      expectedLeftSpeed =  CommandedVelocity - angularVelocityOffset;
+      expectedRightSpeed = CommandedVelocity + angularVelocityOffset;
+      #ifdef debugModeOn 
+      //dprint(term,"L=%f R=%f\t",expectedLeftSpeed,expectedRightSpeed);
+      #endif
+      
+      expectedLeftSpeed =  expectedLeftSpeed / distancePerCount;
+      expectedRightSpeed = expectedRightSpeed / distancePerCount;                
+      #ifdef debugModeOn 
+      //dprint(term,"l=%d r=%d speed l=%d r=%d\n",(int)expectedLeftSpeed,(int)expectedRightSpeed,curLeftspeed,curRightSpeed);
+      #endif
+
+      //Clear flag and timeout      
       got_one = 0;
       timeoutCounter = 0;
-      #ifdef debugModeOn
-       
-      #endif
     }// Timout code needs to be though out better    
-    else if (timeoutCounter > ROStimeout) 
+    if (timeoutCounter > ROStimeout) 
     {
         #ifdef debugModeOn
         dprint(term, "DEBUG: Stopping Robot due to serial timeout.\n");
         #endif
         expectedLeftSpeed = 0;
         expectedRightSpeed = 0;
-        clearTwistRequest();
+        //clearTwistRequest();
         timeoutCounter = 0; //ROStimeout; // Prevent runaway integer length          
     }     
     
@@ -367,14 +417,14 @@ int main()
     if ( safty_check(CommandedVelocity,&expectedLeftSpeed,&expectedRightSpeed) )
     {
       #ifdef debugModeOn
-      //dprint(term, "Safty_Check l=%f r=%f\n",expectedLeftSpeed,expectedRightSpeed );  
+      dprint(term, "Safty_Check l=%f r=%f\n",expectedLeftSpeed,expectedRightSpeed );  
       #endif
-      clearTwistRequest();//ignore twist msg if we are escaping or blocked
+      //clearTwistRequest();//ignore twist msg if we are escaping or blocked
     }    
               
     /* to simplify communications with teh dhb-10 we send the command to go in only one place */
     /* first check if there has been a change dont overload with needless commands */
-    if(curLeftspeed != expectedLeftSpeed || curRightSpeed != expectedRightSpeed && robotInitialized )
+    if( (curLeftspeed != (int)expectedLeftSpeed || curRightSpeed != (int)expectedRightSpeed) && robotInitialized )
     {
       curLeftspeed = (int)expectedLeftSpeed;
       curRightSpeed = (int)expectedRightSpeed;
@@ -394,9 +444,6 @@ int main()
        The rest was heavily inspired/copied from here:
        http://forums.parallax.com/showthread.php/154963-measuring-speed-of-the-ActivityBot?p=1260800&viewfull=1#post1260800
     */
-    #ifdef debugModeOn
-    //dprint(term, "state =  %d\n",state);
-    #endif
 
     switch(state)
     {
@@ -452,17 +499,21 @@ int main()
           #ifdef debugModeOn
           dprint(term, "Starting Cogs\n");
           #endif
+          
+          #ifndef EMULATE_ARLO
           // Start the local sensor polling cog
           ping_start();
-    
+          #endif
+
           // Start Gyro polling in another cog
           #ifdef hasGyro
             gyro_start();
           #endif
 
           // Start safetyOverride cog: (AFTER the Motors are initialized!)
+          #ifndef EMULATE_ARLO
           safetyOverride_start();     
-          
+          #endif
           timeoutCounter = 0;//clear timeout counter  
            
         }          
@@ -537,6 +588,10 @@ int main()
       case 5:// format ping       8ms
         sprint(curbuf,"{");
         curbuf = sensorbuf + strlen(sensorbuf);
+        minPingDist = 255;
+        minPingnum = 255;
+        minIrDist = 255;
+        minIrnum = 255;
         for (i = 0; i < NUMBER_OF_PING_SENSORS; i++) { // Loop through all of the sensors
           if (i > 0)
           {
@@ -545,13 +600,24 @@ int main()
           }                
           sprint(curbuf, "\"p%d\":%d ", i, pingArray[i]);
           curbuf = sensorbuf + strlen(sensorbuf);
+          if(pingArray[i] < minPingDist)
+          {
+            minPingDist = pingArray[i];
+            minPingnum = i;
+          }            
         }      
         for (i = 0; i < NUMBER_OF_IR_SENSORS; i++) // Loop through all of the sensors
         {
           if (irArray[i] > 0) // Don't pass the empty IR entries, as we know there are some.
             sprint(curbuf, ",\"i%d\":%d", i, irArray[i]);
             curbuf = sensorbuf + strlen(sensorbuf);
+            if(irArray[i] < minIrDist)
+            {
+              minIrDist = irArray[i];
+              minIrnum = i;
+            }            
         }
+        
         #ifdef hasFloorObstacleSensors
         for (i = 0; i < NUMBER_OF_FLOOR_SENSORS; i++) // Loop through all of the sensors
         {
@@ -575,9 +641,10 @@ int main()
         // Send a regular "status" update to ROS including information that does not need to be refreshed as often as the odometry.
         dprint(term, "s\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\t%.2f\t%d\t%d\n", 
                   safeToProceed, safeToRecede, Escaping, abd_speedLimit, 
-                  abdR_speedLimit, minDistanceSensor, 
+                  abdR_speedLimit, minPingnum, 
                   BatteryVolts, RawBatVolts, 
-                  cliff, floorO);
+                  cliff, pingArray[minPingnum] ); //floorO);
+                  minPingnum = minIrnum;//hush the compiler warning
         throttleStatus = 0;
         state = 0; //We increment after switch
 //        tm +=  sequencer_get(); // ~1ms or less    
@@ -596,6 +663,27 @@ int main()
 loop_time =  sequencer_get();
 tm += loop_time;
 sequencer_reset(); 
+
+  
+#ifdef EMULATE_ROS 
+ ros_t = rand() % 20 + 0;
+ ros_r=ros_t/10;
+      
+ ros_t = rand() % 10 + 1;
+ if(ros_t > 5)
+ {
+  ros_t = rand() % 100 + 1;
+  ros_v=ros_t/10;
+ }        
+ else
+ {
+  ros_v=0;       
+ } 
+             
+#endif 
+
+
+
 
  }
  return(0); 
@@ -627,15 +715,32 @@ sequencer_reset();
 void ROS()
 {
  //pretend we are ROS and stuff the buffer 
+ int throttle=0;
+ //int t=0;
+ //char tmp[RXBUFFERLEN];
+ 
  pause(3000); 
- strcpy(in_buf,"d,0.403,0.00338,0,0,0,0,0,0.0,0.0,0.0\r");// A Buffer long enough to hold the longest line ROS may send.
+ strcpy(in_buf,"d,0.403000,0.00338,0,0,0,0,0,0.0,0.0,0.0\r");// A Buffer long enough to hold the longest line ROS may send.
  got_one = 1; 
+ while(got_one){;}//Spin till the robot ready
+ double r=0.0;
+ double v=0.9;
  pause(1000);
+ 
  while(1)
  {
     pause(100);
-    strcpy(in_buf,"s,0.000,0.000\r");// A Buffer long enough to hold the longest line ROS may send.
-    got_one = 1;      
+
+    throttle++;
+    if (throttle > 25)
+    {
+      r=ros_r;
+      v=ros_v;
+      throttle=0;
+    }      
+
+    sprint(in_buf,"s,%.3f,%.3f\r",r,v);
+    got_one = 1;
  }    
 }  
 #endif

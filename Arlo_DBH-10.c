@@ -2,7 +2,7 @@
 #include "simpletools.h"
 #include "fdserial.h"
 #include "Arlo_DBH-10.h"
-
+#include "per_robot_settings_for_propeller_c_code.h"
 
 
 
@@ -219,7 +219,7 @@ int drive_get_dist(int *left,int *right)
     *right = 0;
     return(1);
   }
-  sscan(reply, "%d%d", left, right);
+  sscan(reply, "%d%d", *left, *right);
   #endif
   return(0);
 }
@@ -267,7 +267,7 @@ int drive_get_spd(int *left,int *right)
     *right = 0;
     return(1);
   }
-  sscan(reply, "%d%d", left, right);
+  sscan(reply, "%d%d", *left, *right);
   #endif
   return(0);
 }

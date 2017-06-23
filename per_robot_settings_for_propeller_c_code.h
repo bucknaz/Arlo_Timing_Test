@@ -4,7 +4,7 @@
 #define EMULATE_ROS
 
 //If the DHB-10 is not present set this to test code
-//#define EMULATE_ARLO
+#define EMULATE_ARLO
 
 //Set this to emit odometry
 //#define enableOutput // Do NOT comment this out when running ROS!
@@ -14,7 +14,7 @@
 // PROXIMITY SENSOR TUNING
 // Use these to tune the robots responses!
 // What is the maximum distance at which sensor readings should be noticed?
-#define MAX_DISTANCE 70
+#define MAX_DISTANCE 50
 
 // What is the maximum distance at which IR (Infrared) sensor readings should be noticed?
 // IR sensors tend to be less reliable, so make this shorter than the MAX_DISTANCE, which applies to PING sensors.
@@ -112,16 +112,16 @@ All of these will be assumed to face forward. */
 
 #define FRONT_NEAR_LEFT_SENSOR 3
 #define FRONT_NEAR_LEFT_HALT_DIST 10
-#define FRONT_NEAR_LEFT_SLOWDWN_DIST 40
+#define FRONT_NEAR_LEFT_SLOWDWN_DIST 20
 
 // NOTE: IF you comment out the FRONT_CENTER_SENSOR, then ALL Front sensors are ignored for escaping!
 #define FRONT_CENTER_SENSOR 4
-#define FRONT_CENTER_HALT_DIST 5
-#define FRONT_CENTER_SLOWDWN_DIST 8
+#define FRONT_CENTER_HALT_DIST 10
+#define FRONT_CENTER_SLOWDWN_DIST 20
 
 #define FRONT_NEAR_RIGHT_SENSOR 5
 #define FRONT_NEAR_RIGHT_HALT_DIST 5
-#define FRONT_NEAR_RIGHT_SLOWDWN_DIST 8
+#define FRONT_NEAR_RIGHT_SLOWDWN_DIST 20
 
 //#define FRONT_FAR_RIGHT_SENSOR 4
 //#define FRONT_FAR_RIGHT_HALT_DIST 5
@@ -132,17 +132,17 @@ All of these will be assumed to face forward. */
 //#define FAR_NEAR_LEFT_SLOWDWN_DIST 8
 
 #define REAR_NEAR_LEFT_SENSOR 0
-#define REAR_NEAR_LEFT_HALT_DIST 5
-#define REAR_NEAR_LEFT_SLOWDWN_DIST 8
+#define REAR_NEAR_LEFT_HALT_DIST 10
+#define REAR_NEAR_LEFT_SLOWDWN_DIST 20
 
 // NOTE: IF you comment out the REAR_CENTER_SENSOR, then ALL Rear sensors are ignored for escaping!
 #define REAR_CENTER_SENSOR 1
 #define REAR_CENTER_HALT_DIST 10
-#define REAR_CENTER_SLOWDWN_DIST 40
+#define REAR_CENTER_SLOWDWN_DIST 20
 
 #define REAR_NEAR_RIGHT_SENSOR 2
-#define REAR_NEAR_RIGHT_HALT_DIST 12
-#define REAR_NEAR_RIGHT_SLOWDWN_DIST MAX_DISTANCE
+#define REAR_NEAR_RIGHT_HALT_DIST 10
+#define REAR_NEAR_RIGHT_SLOWDWN_DIST 20
 
 //#define REAR_FAR_RIGHT_SENSOR 2
 //#define REAR_FAR_RIGHT_HALT_DIST 12
@@ -282,7 +282,7 @@ Remember though that going faster and "hanging" isn't more responsive.
 has not received a twist command from ROS.
 The loop speed is determined by the above two settings, so it isn't a strict time.
 */
-#define ROStimeout 60 // 10 = about 1 second if dhb10OverloadPause === 2 && mainLoopPause === 10
+#define ROStimeout 120 // 10 = about 1 second if dhb10OverloadPause === 2 && mainLoopPause === 10
 
 /* Enable this to turn on extra debugging information,
 for use with the
