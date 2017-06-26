@@ -14,8 +14,8 @@ extern int abd_speedLimit;
 extern int abdR_speedLimit;
 
 // For "Safety Override" Cog
-volatile int safeToProceed = 0;
-volatile int safeToRecede = 0;
+volatile int safeToProceed = 1;
+volatile int safeToRecede = 1;
 volatile int cliff = 0;
 volatile int floorO = 0;
 volatile int Escaping = 0;
@@ -175,6 +175,8 @@ void safetyOverride_stop()
 int safty_check(double CVel,double *LeftSpeed,double *RightSpeed)
 {
   int results = 0;
+  
+  
   if (Escaping == 1) 
   {
     wasEscaping = 1;

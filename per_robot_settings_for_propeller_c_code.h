@@ -4,12 +4,12 @@
 #define EMULATE_ROS
 
 //If the DHB-10 is not present set this to test code
-#define EMULATE_ARLO
+//#define EMULATE_ARLO
 
 //Set this to emit odometry
-//#define enableOutput // Do NOT comment this out when running ROS!
+#define enableOutput // Do NOT comment this out when running ROS!
 
-#define debugModeOn
+//#define debugModeOn
 
 // PROXIMITY SENSOR TUNING
 // Use these to tune the robots responses!
@@ -21,7 +21,7 @@
 #define IR_MAX_DISTANCE 50
 
 // What is the minimum speed that the speed limiter should set the robot to?
-#define MINIMUM_SPEED 20
+#define MINIMUM_SPEED 29
 // Maximum speed in ticks per second. Even if ROS asks us to go faster, we will not.
 #define MAXIMUM_SPEED 200 // 200 is default in arlodrive too, but we may change it.
 
@@ -111,17 +111,17 @@ All of these will be assumed to face forward. */
 //#define FRONT_FAR_LEFT_SLOWDWN_DIST 40
 
 #define FRONT_NEAR_LEFT_SENSOR 3
-#define FRONT_NEAR_LEFT_HALT_DIST 10
-#define FRONT_NEAR_LEFT_SLOWDWN_DIST 20
+#define FRONT_NEAR_LEFT_HALT_DIST 5
+#define FRONT_NEAR_LEFT_SLOWDWN_DIST 40
 
 // NOTE: IF you comment out the FRONT_CENTER_SENSOR, then ALL Front sensors are ignored for escaping!
 #define FRONT_CENTER_SENSOR 4
 #define FRONT_CENTER_HALT_DIST 10
-#define FRONT_CENTER_SLOWDWN_DIST 20
+#define FRONT_CENTER_SLOWDWN_DIST 40
 
 #define FRONT_NEAR_RIGHT_SENSOR 5
 #define FRONT_NEAR_RIGHT_HALT_DIST 5
-#define FRONT_NEAR_RIGHT_SLOWDWN_DIST 20
+#define FRONT_NEAR_RIGHT_SLOWDWN_DIST 40
 
 //#define FRONT_FAR_RIGHT_SENSOR 4
 //#define FRONT_FAR_RIGHT_HALT_DIST 5
@@ -132,17 +132,17 @@ All of these will be assumed to face forward. */
 //#define FAR_NEAR_LEFT_SLOWDWN_DIST 8
 
 #define REAR_NEAR_LEFT_SENSOR 0
-#define REAR_NEAR_LEFT_HALT_DIST 10
-#define REAR_NEAR_LEFT_SLOWDWN_DIST 20
+#define REAR_NEAR_LEFT_HALT_DIST 15
+#define REAR_NEAR_LEFT_SLOWDWN_DIST 40
 
 // NOTE: IF you comment out the REAR_CENTER_SENSOR, then ALL Rear sensors are ignored for escaping!
 #define REAR_CENTER_SENSOR 1
 #define REAR_CENTER_HALT_DIST 10
-#define REAR_CENTER_SLOWDWN_DIST 20
+#define REAR_CENTER_SLOWDWN_DIST 40
 
 #define REAR_NEAR_RIGHT_SENSOR 2
-#define REAR_NEAR_RIGHT_HALT_DIST 10
-#define REAR_NEAR_RIGHT_SLOWDWN_DIST 20
+#define REAR_NEAR_RIGHT_HALT_DIST 15
+#define REAR_NEAR_RIGHT_SLOWDWN_DIST 40
 
 //#define REAR_FAR_RIGHT_SENSOR 2
 //#define REAR_FAR_RIGHT_HALT_DIST 12

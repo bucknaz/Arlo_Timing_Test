@@ -27,7 +27,7 @@ static char rx_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line
 char in_buf[RXBUFFERLEN];// A Buffer long enough to hold the longest line ROS may send.
 static int rx_count = 0;
 volatile int got_one = 0;
-
+static int dbh_Error = 0;
 
 
 #ifdef hasGyro
@@ -233,7 +233,8 @@ int main()
   simpleterm_close();
   term = fdserial_open(31, 30, 0, 115200);
   pause(1000);//Give the terminal a sec to get started
-  
+
+  //We rolled our own ms time cog  
   sequencer_start();
   
   
@@ -251,12 +252,33 @@ int main()
   #endif
   
 
+
+
   rx_count = 0; // clear the input buffer  
 
   // setup a buffer to build the output strings in
   char sensorbuf[132];
   memset(sensorbuf, 0, 132);
   char *curbuf = sensorbuf;  
+
+  void handle_error()
+  {
+    get_last(sensorbuf);
+    dprint(term, "Sent %s" ,sensorbuf ); 
+    dprint(term, "DBH-10 Communications Error\n"); 
+    get_reply(sensorbuf);
+    dprint(term, "got \"%s\"\n" ,sensorbuf ); 
+
+    drive_get_ver(sensorbuf);
+    dprint(term, "%s\n" ,sensorbuf ); 
+
+    dbh_Error = 1;
+    while(1) {pause(1000);}
+
+  }    
+
+
+
        
   //used for calculating values     
   double deltaDistance = 0;
@@ -312,15 +334,31 @@ int main()
   // NOTE: Because this function has a loop, ALL interaction with the DHB-10 is done in this main loop.
   // Any other cog/function that needs to affect the robot's motors will set variables that are read in this function.
 
+  drive_open();
+//  pause(5);
+  
+/*
+  drive_get_hwver(sensorbuf);
+  dprint(term, "%s\n" ,sensorbuf ); 
+    get_reply(sensorbuf);
+    dprint(term, "* %s\n" ,sensorbuf ); 
+
+  drive_get_ver(sensorbuf);
+  dprint(term, "%s\n" ,sensorbuf ); 
+    get_reply(sensorbuf);
+    dprint(term, "* %s\n" ,sensorbuf ); 
+*/  
+  dhb10_send("VER\r");
+  dhb10_send("VER\r");
   // Halt motors in case they are moving and reset all stats.
   if (drive_set_stop() )
   {
-    dprint(term, "drive set stop Error\n");  
-    ;// handle error
+    handle_error();// handle error
   }   
+  
   if ( drive_rst() )
   {
-    ;// handle error
+    handle_error();// handle error
   }      
   // For Debugging without ROS:
   // See ~/catkin_ws/src/ArloBot/src/arlobot/arlobot_bringup/param/arlobot.yaml for most up to date values
@@ -413,7 +451,7 @@ int main()
        This also allows us to have a STOP action if there is no input
        from ROS for too long.
     */
-
+/*
     if ( safty_check(CommandedVelocity,&expectedLeftSpeed,&expectedRightSpeed) )
     {
       #ifdef debugModeOn
@@ -421,7 +459,7 @@ int main()
       #endif
       //clearTwistRequest();//ignore twist msg if we are escaping or blocked
     }    
-              
+*/              
     /* to simplify communications with teh dhb-10 we send the command to go in only one place */
     /* first check if there has been a change dont overload with needless commands */
     if( (curLeftspeed != (int)expectedLeftSpeed || curRightSpeed != (int)expectedRightSpeed) && robotInitialized )
@@ -431,7 +469,7 @@ int main()
       //pause(dhb10OverloadPause);
       if ( drive_set_gospd(curLeftspeed,curRightSpeed) )
       {
-        ;// handle error
+        handle_error();// handle error
       }    
       #ifdef debugModeOn
       dprint(term, "go speed l=%d r=%d\n",curLeftspeed,curRightSpeed );
@@ -522,7 +560,7 @@ int main()
       case 1:// read speed   8ms        
         if ( drive_get_spd(&speedLeft, &speedRight) )
         {
-          ;// handle error
+          handle_error();// handle error
         }    
         break;
 
@@ -531,14 +569,14 @@ int main()
         ticksRightOld = ticksRight;
         if ( drive_get_dist(&ticksLeft,&ticksRight) )
         {
-          ;// handle error
+          handle_error();// handle error
         }          
         break;
 
       case 3:// read heading  7ms
         if ( drive_get_head(&heading) )
         {
-          ;// handle error
+          handle_error();// handle error
         }            
         // The heading is apparently reversed in relation to what ROS expects, hence the "-heading"
         Heading = -heading * PI / 180.0; // Convert to Radians
@@ -580,13 +618,14 @@ int main()
         #ifdef hasGyro
         sprint(sensorbuf,"o\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f",X,Y,Heading,gyroHeading,V,Omega);
         #else      
-        sprint(sensorbuf,"o\t%.3f\t%.3f\t%.3f\t0.0\t%.3f\t%.3f",X,Y,Heading,V,Omega);
+        //sprint(sensorbuf,"o\t%.3f\t%.3f\t%.3f\t0.0\t%.3f\t%.3f",X,Y,Heading,V,Omega);
+        sprint(sensorbuf,"o\t%d\t%d\t%.3f\t0.0\t%.3f\t%.3f",deltaTicksLeft,deltaTicksRight,Heading,V,Omega);
         #endif
         curbuf = sensorbuf + strlen(sensorbuf);
         break;
 
       case 5:// format ping       8ms
-        sprint(curbuf,"{");
+        sprint(curbuf,"\t{");
         curbuf = sensorbuf + strlen(sensorbuf);
         minPingDist = 255;
         minPingnum = 255;
@@ -666,14 +705,14 @@ sequencer_reset();
 
   
 #ifdef EMULATE_ROS 
- ros_t = rand() % 20 + 0;
- ros_r=ros_t/10;
+ ros_t = rand() % 200 + 0;
+ ros_r=ros_t/100;
       
- ros_t = rand() % 10 + 1;
- if(ros_t > 5)
+ ros_t = rand() % 100 + 1;
+ if(ros_t > 90)
  {
   ros_t = rand() % 100 + 1;
-  ros_v=ros_t/10;
+  ros_v=ros_t/100;
  }        
  else
  {
@@ -720,17 +759,39 @@ void ROS()
  //char tmp[RXBUFFERLEN];
  
  pause(3000); 
- strcpy(in_buf,"d,0.403000,0.00338,0,0,0,0,0,0.0,0.0,0.0\r");// A Buffer long enough to hold the longest line ROS may send.
+ strcpy(in_buf,"d,0.403000,0.00338,0,1,1,1,0,0.0,0.0,0.0\r");// A Buffer long enough to hold the longest line ROS may send.
  got_one = 1; 
  while(got_one){;}//Spin till the robot ready
  double r=0.0;
  double v=0.9;
+ int ping;
  pause(1000);
- 
+//#define FRONT_CENTER_SENSOR 4
+//#define FRONT_CENTER_HALT_DIST 10
+//#define FRONT_CENTER_SLOWDWN_DIST 20 
  while(1)
  {
     pause(100);
-
+    ping = pingArray[FRONT_CENTER_SENSOR];
+    //ping = 45;
+    if(ping < 30)
+    {
+      r = -0.15;
+      v = 0.1;
+    }
+    else if( ping > 40)
+    {
+      r = 0.18;
+      v = 0.1;
+    }
+    else
+    {
+      r = 0.0;
+      v = 0.0;
+    }            
+            
+    
+/*  random moving
     throttle++;
     if (throttle > 25)
     {
@@ -738,7 +799,7 @@ void ROS()
       v=ros_v;
       throttle=0;
     }      
-
+*/
     sprint(in_buf,"s,%.3f,%.3f\r",r,v);
     got_one = 1;
  }    

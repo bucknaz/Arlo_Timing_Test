@@ -39,8 +39,10 @@ int drive_get_dist(int *left,int *right);
 int drive_get_head(int *heading);
 int drive_get_spd(int *left,int *right);
 int drive_rst();
-
-
+int drive_get_hwver(char *ver);
+int drive_get_ver(char *ver);
+int get_reply(char *buf);
+int get_last(char *buf);
 
 #if defined(__cplusplus)                     
 }

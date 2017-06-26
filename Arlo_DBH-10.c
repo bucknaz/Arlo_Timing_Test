@@ -3,7 +3,7 @@
 #include "fdserial.h"
 #include "Arlo_DBH-10.h"
 #include "per_robot_settings_for_propeller_c_code.h"
-
+#include "sequencer.h"
 
 
 fdserial *ard_dhb10_arlo;
@@ -13,6 +13,7 @@ int ard_servo_pin_R    = ARD_DEFAULT_SERVO_R;
 int ard_opened         = ARD_DEFAULT_OPENED;
 
 char dhb10_reply[DHB10_LEN];
+char dhb10_cmd[DHB10_LEN];
 
 
 /*
@@ -72,10 +73,19 @@ char *drive_open(void)
     fdserial_txChar(ard_dhb10_arlo, '2');
     fdserial_txChar(ard_dhb10_arlo, '\r');    
   #endif   
-  //reply = dhb10_com("\r");
-  //reply = dhb10_com("verb 1\r");
-  dhb10_send("\r");
-  dhb10_send("verb 1\r");
+//  pause(2);
+//  if(dhb10_send("\r") == -1)
+//    return(1);
+
+//  pause(2);
+//  if(dhb10_send("VER\r"))
+//    return(1);;
+
+//  pause(2);
+//  if(dhb10_send("VERB 1\n"))
+//    return(1);
+    
+  fdserial_rxFlush(ard_dhb10_arlo);
   #endif
   return reply;
 }
@@ -105,9 +115,11 @@ int dhb10_send(char *CmdStr)
   return(1);
   #else
   memset(dhb10_reply, 0, DHB10_LEN);
+  memset(dhb10_cmd, 0, DHB10_LEN);
   char *reply = dhb10_reply;
   memset(reply,0,DHB10_LEN);//Empty the String
-       
+  strcpy(dhb10_cmd, CmdStr);
+    
   if(!ard_opened) drive_open();
 
   int ca = 0, cta = 0;
@@ -118,9 +130,11 @@ int dhb10_send(char *CmdStr)
   
   while(1) 
   {
+    //if( (CmdStr[i] == 0)) break;
     fdserial_txChar(ard_dhb10_arlo, CmdStr[i]);
     if((CmdStr[i] == '\r') || (CmdStr[i] == 0)) break;
     i++;
+    //if( (CmdStr[i] == 0)) break;
   }
   
   // No cmd just a return
@@ -128,10 +142,9 @@ int dhb10_send(char *CmdStr)
   {
     return 0;
   }    
-
+  
   i = 0;
-  int t = CNT;
-  int dt = CLKFREQ;
+  int dt = sequencer_get()+100;
   while(1)
   {
     cta = fdserial_rxCount(ard_dhb10_arlo);
@@ -139,7 +152,7 @@ int dhb10_send(char *CmdStr)
     {
       ca = readChar(ard_dhb10_arlo);
       dhb10_reply[i] = ca;
-      if(dhb10_reply[i] == '\r')
+      if(ca == '\r' || ca == 0)
       {
         reply = dhb10_reply;
         break;
@@ -147,18 +160,22 @@ int dhb10_send(char *CmdStr)
       i++;
     }
 
-    if(CNT - t > dt)
+    if( dt < sequencer_get())
     {
       strcpy(reply, "Error, no reply from DHB-10!\r");
       break;
     }  
+
   }
+  
+  
   //remove the \r
   if(strlen(reply) > 0)
      reply[strlen(reply)-1] = 0;
   //Check for errors
   if( reply[0] == 'E' || reply[strlen(reply)] == 'E')
     return(-1);
+    
   return(strlen(reply));    
   #endif
 }
@@ -219,7 +236,7 @@ int drive_get_dist(int *left,int *right)
     *right = 0;
     return(1);
   }
-  sscan(reply, "%d%d", *left, *right);
+  sscan(reply, "%d%d", left, right);
   #endif
   return(0);
 }
@@ -267,7 +284,7 @@ int drive_get_spd(int *left,int *right)
     *right = 0;
     return(1);
   }
-  sscan(reply, "%d%d", *left, *right);
+  sscan(reply, "%d%d", left, right);
   #endif
   return(0);
 }
@@ -288,3 +305,66 @@ int drive_rst()
   #endif
   return(0);  
 }
+
+/*   Utility functions to make life easyer */
+//RST
+//VERB
+/*
+ * drive_get_hwver(int *ver)
+ *
+ * Returns 0 on succsess else 1
+*/
+int drive_get_hwver(char *ver)
+{
+  #ifdef EMULATE_ARLO
+  pause(7);
+  *ver = 0;
+  #else
+  char *reply = dhb10_reply;
+  int results = dhb10_send("HWVER\r");
+  if ( results == -1) 
+  {
+    *ver = 0;
+    return(1);
+  } 
+  strcpy(ver,dhb10_reply); 
+  #endif
+  return(0);
+}
+
+/*
+ * drive_get_ver(int *ver)
+ *
+ * Returns 0 on succsess else 1
+*/
+int drive_get_ver(char *ver)
+{
+  #ifdef EMULATE_ARLO
+  pause(7);
+  *ver = 0;
+  #else
+  char *reply = dhb10_reply;
+  int results = dhb10_send("VER\r");
+  if ( results == -1) 
+  {
+    *ver = 0;
+    return(1);
+  } 
+  strcpy(ver,dhb10_reply);
+  #endif
+  return(0);
+}
+
+
+int get_reply(char *buf)
+{
+  strcpy(buf,dhb10_reply);
+  return(strlen(buf));
+}
+
+int get_last(char *buf)
+{
+  strcpy(buf,dhb10_cmd);
+  return(strlen(buf));
+}
+  
