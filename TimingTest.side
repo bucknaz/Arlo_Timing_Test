@@ -8,6 +8,8 @@ Arlo_mcp3008.c
 per_robot_settings_for_propeller_c_code.h
 Arlo_SafetyOverride.h
 Arlo_DBH-10.h
+-I ./../../Learn/Simple Libraries/Robotics/libdhb10
+-L ./../../Learn/Simple Libraries/Robotics/libdhb10
 >compiler=C
 >memtype=cmm main ram compact
 >optimize=-Os
@@ -16,4 +18,5 @@ Arlo_DBH-10.h
 >-fno-exceptions
 >defs::-std=c99
 >-lm
+>linker::-ldhb10
 >BOARD::ACTIVITYBOARD

@@ -30,7 +30,7 @@ extern "C" {
 
 /* Public Functions in this file */
 int dhb10_send(char *CmdStr);
-char *drive_open(void);
+void drive_open(void);
 void drive_close(void);
 
 int drive_set_stop();
